@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="32px"
+   height="32px"
+   id="svg3185"
+   version="1.1"
+   inkscape:version="0.48.5 r10040"
+   inkscape:export-filename="/home/risto/Dropbox/defend-ukraine/img/bullet.png"
+   inkscape:export-xdpi="45"
+   inkscape:export-ydpi="45"
+   sodipodi:docname="Uus dokument 14">
+  <defs
+     id="defs3187">
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath4000">
+      <path
+         sodipodi:type="arc"
+         style="fill:#a4a4a4;fill-opacity:1;stroke:none"
+         id="path4002"
+         sodipodi:cx="13.975957"
+         sodipodi:cy="3.6015697"
+         sodipodi:rx="2.8130522"
+         sodipodi:ry="2.9023552"
+         d="m 16.789009,3.6015697 a 2.8130522,2.9023552 0 1 1 -5.626104,0 2.8130522,2.9023552 0 1 1 5.626104,0 z"
+         transform="matrix(1.4444444,0,0,1,-4.6821952,1.5630752)" />
+    </clipPath>
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="22.395604"
+     inkscape:cx="8.2314249"
+     inkscape:cy="16.521748"
+     inkscape:current-layer="layer1"
+     showgrid="true"
+     inkscape:grid-bbox="true"
+     inkscape:document-units="px"
+     inkscape:window-width="1920"
+     inkscape:window-height="1041"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1" />
+  <metadata
+     id="metadata3190">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     id="layer1"
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer">
+    <rect
+       style="fill:#a4a4a4;fill-opacity:1;stroke:none"
+       id="rect3218"
+       width="8.1265945"
+       height="19.370871"
+       x="11.609422"
+       y="7.2093234" />
+    <rect
+       transform="matrix(1,0,0,-1.6889801,0.19533953,15.816923)"
+       style="fill:#bf9b4a;fill-opacity:1;stroke:none"
+       id="rect3218-6"
+       width="8.1265945"
+       height="21.955553"
+       x="11.386164"
+       y="5.1197248"
+       clip-path="url(#clipPath4000)" />
+    <rect
+       style="fill:#bf9b4a;fill-opacity:1;stroke:none"
+       id="rect4030"
+       width="8.1712465"
+       height="1.575803"
+       x="11.609421"
+       y="26.718113" />
+  </g>
+</svg>
