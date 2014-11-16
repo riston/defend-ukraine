@@ -105,7 +105,7 @@ Game.prototype = {
 
         // Score button
         this.scoreText = this.game.add.text(
-            this.game.width - 200, this.game.height - 50, 'Score:',{
+            this.game.width - 250, this.game.height - 50, 'Score:',{
             font: "32px Creepster",
             fill: '#ffffff',
         });
@@ -140,6 +140,7 @@ Game.prototype = {
     },
 
     _onTimer: function () {
+
         this.batteryLevel -= 5;
         console.log('Called timer');
 
@@ -248,6 +249,11 @@ Game.prototype = {
             .to({ alpha: 1 }, Phaser.Easing.Linear.Out)
             .start();
 
+
+        if (enemy.key === "tank") {
+            this.tanks._addSpriteMove(enemy);
+        }
+
         enemy.health = this.ENEMY_HEALTH;
         this.game.physics.enable(enemy, Phaser.Physics.ARCADE);
     },
@@ -319,7 +325,6 @@ Game.prototype = {
             this.game.sound.play('dead');
             this._setText('+' + score + ' points');
 
-            enemy.x = 0;
             enemy.kill();
         }
     },

@@ -19,6 +19,8 @@ Boot.prototype = {
         this.load.image('gun', 'img/gun.png');
         this.load.image('tank', 'img/tank.png');
         this.load.image('truck', 'img/truck.png');
+        this.load.image('evergreen', 'img/evergreen.png');
+        this.load.image('tree', 'img/tree.png');
         this.load.image('background', 'img/background.jpg');
         this.load.image('main-theme', 'img/main_theme.jpg');
 
