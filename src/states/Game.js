@@ -2,6 +2,9 @@
  * Created by risto on 25.10.14.
  */
 var Storage = require('../Storage');
+var SoldierGroup = require('../groups/SoldierGroup');
+var TruckGroup = require('../groups/TruckGroup');
+var TankGroup = require('../groups/TankGroup');
 
 var Game = function(game) {
 
@@ -30,29 +33,23 @@ Game.prototype = {
         this.background.anchor.set(0.5, 0.5);
 
         // Tanks pool
-        this.tanks = this.add.group();
-        this.tanks.setAll('enableBody', true);
-        this.tanks.createMultiple(2, 'tank');
-        this.tanks.setAll('outOfBoundsKill', true);
-        this.tanks.forEach(this._spawnEnemy, this);
-        this.tanks.forEach(this._addSpriteMove, this);
+        this.tanks = new TankGroup(this.game);
+        this.tanks.spawnAll();
+        this.tanks.moveStep();
 
         // Truck pool
-        this.trucks = this.add.group();
-        this.trucks.setAll('enableBody', true);
-        this.trucks.createMultiple(1, 'truck');
-        this.trucks.forEach(this._spawnEnemy, this);
+        this.trucks = new TruckGroup(this.game);
+        this.trucks.spawnAll();
 
-        // Enemies - soldiers pool
-        this.enemies = this.add.group();
-        this.enemies.setAll('enableBody', true);
-        this.enemies.createMultiple(5, 'soldier');
-        this.enemies.forEach(this._spawnEnemy, this);
+        // Soldiers pool
+        this.soldiers = new SoldierGroup(this.game);
+        this.soldiers.spawnAll();
 
         // Bullets pool
         this.bullets = this.add.group();
         this.bullets.createMultiple(10, 'bullet');
         this.bullets.forEach(function (bullet) {
+
             bullet.bulletShotAt = 0;
             bullet.enableBody = true;
             bullet.reset(0,0);
@@ -67,7 +64,6 @@ Game.prototype = {
         this.light.anchor = new Phaser.Point(0.5, 0.5);
         this.light.fixedToCamera = true;
         this.game.physics.enable(this.light, Phaser.Physics.ARCADE);
-
 
         this.game.add.sprite(
             this.game.width - 40,
@@ -121,31 +117,34 @@ Game.prototype = {
         });
 
         // Change camera location if mouse has moved
-        this.game.input.mouse.onMouseMove = function (evt) {
-            this.light.cameraOffset.x = evt.offsetX;
-            this.light.cameraOffset.y = evt.offsetY;
-
-            var targetAngle = this.game.math.angleBetween(
-                evt.x, evt.y,
-                this.gun.position.x, this.gun.position.y
-            );
-
-            if (this.game.math.degToRad(0) <= targetAngle ||
-                this.game.math.degToRad(180) >= targetAngle) {
-
-                this.gun.rotation = targetAngle;
-            }
-
-        }.bind(this);
+        this.game.input.mouse.onMouseMove = this._onMouseMove.bind(this);
 
         this.graphics = this.game.add.graphics(0, 0);
+    },
+
+    _onMouseMove: function (ev) {
+
+        this.light.cameraOffset.x = ev.offsetX;
+        this.light.cameraOffset.y = ev.offsetY;
+
+        var targetAngle = this.game.math.angleBetween(
+            ev.x, ev.y,
+            this.gun.position.x, this.gun.position.y
+        );
+
+        if (this.game.math.degToRad(0) <= targetAngle ||
+            this.game.math.degToRad(180) >= targetAngle) {
+
+            this.gun.rotation = targetAngle;
+        }
     },
 
     _onTimer: function () {
         this.batteryLevel -= 5;
         console.log('Called timer');
 
-        this.enemies.forEach(function (enemy) {
+        this.soldiers.forEach(function (enemy) {
+
             enemy.body.velocity.x = this.rnd.integerInRange(-15, 15);
         }, this);
     },
@@ -178,7 +177,7 @@ Game.prototype = {
         this.updateFPS();
 
         // Spawn dead enemies
-        this.enemies.forEachDead(this._spawnEnemy, this);
+        this.soldiers.forEachDead(this._spawnEnemy, this);
         this.trucks.forEachDead(this._spawnEnemy, this);
         this.tanks.forEachDead(this._spawnEnemy, this);
 
@@ -253,38 +252,6 @@ Game.prototype = {
         this.game.physics.enable(enemy, Phaser.Physics.ARCADE);
     },
 
-    _addSpriteMove: function (enemy) {
-
-        var vanHalen = function (v) {
-
-            return Math.sin(v * Math.PI) * 1;
-        };
-
-        var dir  = this.game.math.chanceRoll();
-        var sx, sy, ex, ey;
-
-        enemy.move = this.game.add.tween(enemy);
-        enemy.jump = this.game.add.tween(enemy);
-
-        if (dir) {
-            sx = 0;
-            sy = this.rnd.integerInRange(50, this.game.height - 75);
-            ex = this.game.width;
-            enemy.scale.x *= -1;
-        }
-        else {
-            sx = this.game.width;
-            sy = this.rnd.integerInRange(50, this.game.height - 75);
-            ex = 0;
-        }
-
-        enemy.x = sx;
-        enemy.move.to({ x: ex }, 15 * 1000);
-
-        enemy.jump.to({ y: sy }, 15 * 1000, vanHalen, true, 0, Number.MAX_VALUE, 0);
-        enemy.move.start();
-    },
-
     render: function () {
 
         this.game.debug.body(this.bullets);
@@ -315,7 +282,7 @@ Game.prototype = {
         this.game.sound.play('shot');
 
         // Check for overlapping with bullet
-        this.game.physics.arcade.overlap(bullet, this.enemies, this._collisionHandler, null, this);
+        this.game.physics.arcade.overlap(bullet, this.soldiers, this._collisionHandler, null, this);
         this.game.physics.arcade.overlap(bullet, this.tanks, this._collisionHandler, null, this);
         this.game.physics.arcade.overlap(bullet, this.trucks, this._collisionHandler, null, this);
     },
@@ -351,9 +318,6 @@ Game.prototype = {
             this.score += score;
             this.game.sound.play('dead');
             this._setText('+' + score + ' points');
-
-            enemy.move.stop();
-            enemy.jump.stop();
 
             enemy.x = 0;
             enemy.kill();
