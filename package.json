@@ -1,0 +1,25 @@
+{
+  "name": "defend-ukraine",
+  "version": "1.0.0",
+  "description": "Game to defene Ukraine from invaders.",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm test"
+  },
+  "keywords": [
+    "game",
+    "ukraine",
+    "2d"
+  ],
+  "author": "Risto Novik",
+  "license": "MIT",
+  "devDependencies": {
+    "webpack": "^1.4.8"
+  },
+  "dependencies": {
+    "phaser": "^2.1.2",
+    "tmi": "^0.1.3",
+    "webpack": "^1.4.8",
+    "webpack-dev-server": "^1.6.5"
+  }
+}
