@@ -8,6 +8,10 @@ There is no need for installation if you only want to run the game, there is alr
 
 ```npm install```
 
+Build bundle file:
+
+```webpack```
+
 To run the webpack server:
 
 ```webpack-dev-server --progress --colors src```

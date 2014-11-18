@@ -74,30 +74,33 @@
 	Boot.prototype = {
 
 	    preload: function() {
+	        var imgP = './img/';
 
-	        this.load.image('preloaderBg', 'img/loading-bg.png');
-	        this.load.image('preloaderBar', 'img/loading-bar.png');
-	//        this.load.image('start-button', 'img/new_game_button.png');
-	        this.load.image('bullet', 'img/shot.png');
-	        this.load.image('bullet-shell', 'img/bullet.png');
-	        this.load.image('soldier', 'img/soldier.png');
-	        this.load.image('light', 'img/light.png');
-	        this.load.image('flashlight', 'img/flashlight.png');
-	        this.load.image('gun', 'img/gun.png');
-	        this.load.image('tank', 'img/tank.png');
-	        this.load.image('background', 'img/background.jpg');
-	        this.load.image('main-theme', 'img/main_theme.jpg');
+	        this.load.image('preloaderBg',  imgP + 'loading-bg.png');
+	        this.load.image('preloaderBar', imgP + 'loading-bar.png');
+	        this.load.image('bullet',       imgP + 'shot.png');
+	        this.load.image('bullet-shell', imgP + 'bullet.png');
+	        this.load.image('soldier',      imgP + 'soldier.png');
+	        this.load.image('light',        imgP + 'light.png');
+	        this.load.image('flashlight',   imgP + 'flashlight.png');
+	        this.load.image('gun',          imgP + 'gun.png');
+	        this.load.image('tank',         imgP + 'tank.png');
+	        this.load.image('truck',        imgP + 'truck.png');
+	        this.load.image('evergreen',    imgP + 'evergreen.png');
+	        this.load.image('tree',         imgP + 'tree.png');
+	        this.load.image('background',   imgP + 'background.jpg');
+	        this.load.image('main-theme',   imgP + 'main_theme.jpg');
 
 	        // Button
-	        this.load.image('new-game', 'img/button/new_game.png');
+	        this.load.image('new-game', imgP + 'button/new_game.png');
 	//        this.load.image('new-game-hover', 'img/button/new_game_hover.png');
 	//        this.load.image('new-game-click', 'img/button/new_game_click.png');
 
-	        this.load.image('tutorial', 'img/button/tutorial.png');
+	        this.load.image('tutorial', imgP + 'button/tutorial.png');
 	//        this.load.image('tutorial-hover', 'img/button/tutorial_hover.png');
 	//        this.load.image('tutorial-click', 'img/button/tutorial_click.png');
 
-	        this.load.image('fullscreen', 'img/button/fullscreen.png');
+	        this.load.image('fullscreen', imgP + 'button/fullscreen.png');
 	//        this.load.image('fullscreen-hover', 'img/button/fullscreen_hover.png');
 	//        this.load.image('fullscreen-click', 'img/button/fullscreen_click.png');
 
@@ -123,6 +126,7 @@
 	};
 
 	module.exports = Boot;
+
 
 /***/ },
 /* 2 */
@@ -173,6 +177,7 @@
 	/**
 	 * Created by risto on 19.10.14.
 	 */
+	var Storage = __webpack_require__(5);
 
 	var MainMenu = function(game) {};
 
@@ -187,6 +192,7 @@
 	        this.game.scale.enterFullScreen.add(this._onEnterFullScreen, this);
 	        this.game.scale.leaveFullScreen.add(this._onLeaveFullScreen, this);
 
+
 	        // Add background
 	        this.background = this.game.add.sprite(this.game.world.centerX, this.game.world.centerY, 'main-theme');
 	        this.background.anchor.set(0.5, 0.47);
@@ -197,29 +203,43 @@
 	        y += 70;
 	        this.game.add.button(x, y, 'fullscreen', this.onFullscreen, this);
 
+	        if (Storage.isSupported && Storage.get('defend.score')) {
+
+	            this.scoreText = this.game.add.text(
+	                this.game.width - 250, 130, 'Last score:\n' + Storage.get('defend.score') || 0, {
+	                font: '24px Creepster',
+	                fill: '#ffffff',
+	                align: 'center',
+	            });
+	            this.scoreText.angle = 10;
+	        }
 	    },
 
 	    _onEnterFullScreen: function () {
+
 	        console.log('Enter full screen');
 	        this.game.scale.refresh();
 	    },
 
 	    _onLeaveFullScreen: function () {
+
 	        console.log('Leave full screen');
 	    },
 
 	    onFullscreen: function () {
+
 	        this.game.scale.startFullScreen();
 	    },
 
 	    onStartClick: function () {
-	        console.log('Start game');
 
+	        console.log('Start game');
 	        this.game.state.start('Game');
 	    }
 	};
 
 	module.exports = MainMenu;
+
 
 /***/ },
 /* 4 */
@@ -228,11 +248,16 @@
 	/**
 	 * Created by risto on 25.10.14.
 	 */
+	var Storage = __webpack_require__(5);
+	var SoldierGroup = __webpack_require__(6);
+	var TruckGroup = __webpack_require__(7);
+	var TankGroup = __webpack_require__(8);
 
 	var Game = function(game) {
+
 	    this.BULLET_RADIUS = 30;
 	    this.SHOT_DELAY = 200;
-	    this.ENEMY_HEALTH = 100;
+	    this.ENEMY_HEALTH = 30;
 
 	    this.lastBulletShotAt = 0;
 	};
@@ -246,22 +271,32 @@
 	        this.game.stage.backgroundColor = '#182d3b';
 	        this.game.physics.startSystem(Phaser.Physics.ARCADE);
 
+	        // Variable decleration
 	        this.batteryLevel = 100;
+	        this.score = 0;
 
 	        // Add background
 	        this.background = this.game.add.sprite(this.game.world.centerX, this.game.world.centerY, 'background');
 	        this.background.anchor.set(0.5, 0.5);
 
-	        // Enemies pool
-	        this.enemies = this.add.group();
-	        this.enemies.setAll('enableBody', true);
-	        this.enemies.createMultiple(5, 'soldier');
-	        this.enemies.forEach(this._spawnEnemy, this);
+	        // Tanks pool
+	        this.tanks = new TankGroup(this.game);
+	        this.tanks.spawnAll();
+	        this.tanks.moveStep();
+
+	        // Truck pool
+	        this.trucks = new TruckGroup(this.game);
+	        this.trucks.spawnAll();
+
+	        // Soldiers pool
+	        this.soldiers = new SoldierGroup(this.game);
+	        this.soldiers.spawnAll();
 
 	        // Bullets pool
 	        this.bullets = this.add.group();
 	        this.bullets.createMultiple(10, 'bullet');
 	        this.bullets.forEach(function (bullet) {
+
 	            bullet.bulletShotAt = 0;
 	            bullet.enableBody = true;
 	            bullet.reset(0,0);
@@ -276,9 +311,6 @@
 	        this.light.anchor = new Phaser.Point(0.5, 0.5);
 	        this.light.fixedToCamera = true;
 	        this.game.physics.enable(this.light, Phaser.Physics.ARCADE);
-
-	        // Show FPS
-	        this.game.time.advancedTiming = true;
 
 	        this.game.add.sprite(
 	            this.game.width - 40,
@@ -300,49 +332,69 @@
 	        this.shellEmitter.lifespan = 800;
 	        this.shellEmitter.gravity = 200;
 
-	        this.game.add.sprite(300, 200, 'tank');
-
-	//        this.shellEmitter.start(false, 5000, 50);
-
-	//        this.game.add.tween(this.shellEmitter)
-	//            .to( { emitX: 600 }, 2000, Phaser.Easing.Back.InOut, true, 0, Number.MAX_VALUE, true);
+	        // Show FPS
+	        this.game.time.advancedTiming = true;
 
 	        this.fpsText = this.game.add.text(20, 20, '', {
-	            font: "16px Creepster",
+	            font: '16px Creepster',
 	            fill: '#ffffff',
 	            fontWeight: 'normal'
 	        });
 
 	        this.loopTimer = this.game.time.events.loop(1000, this._onTimer, this);
 
+	        this.enemyMove = this.game.time.events.repeat(Phaser.Timer.SECOND * 3, 10, this._onTimer, this);
+
 	        // Mute button
-	        this.muteButton = this.game.add.button(this.game.width - 100, this.game.height - 50,
+	        this.muteButton = this.game.add.button(
+	            this.game.width - 100, this.game.height - 50,
 	            'mute', this._onMuteClick, this, 1, 0, 2);
 
+	        // Score button
+	        this.scoreText = this.game.add.text(
+	            this.game.width - 250, this.game.height - 50, 'Score:',{
+	            font: "32px Creepster",
+	            fill: '#ffffff',
+	        });
+
+	        this.infoText = this.game.add.text(
+	            this.game.width / 2, 70, '',{
+	            font: "32px Creepster",
+	            fill: '#ffffff',
+	        });
+
 	        // Change camera location if mouse has moved
-	        this.game.input.mouse.onMouseMove = function (evt) {
-	            this.light.cameraOffset.x = evt.offsetX;
-	            this.light.cameraOffset.y = evt.offsetY;
-
-	            var targetAngle = this.game.math.angleBetween(
-	                evt.x, evt.y,
-	                this.gun.position.x, this.gun.position.y
-	            );
-
-	            if (this.game.math.degToRad(0) <= targetAngle ||
-	                this.game.math.degToRad(180) >= targetAngle) {
-
-	                this.gun.rotation = targetAngle;
-	            }
-
-	        }.bind(this);
+	        this.game.input.mouse.onMouseMove = this._onMouseMove.bind(this);
 
 	        this.graphics = this.game.add.graphics(0, 0);
 	    },
 
+	    _onMouseMove: function (ev) {
+
+	        this.light.cameraOffset.x = ev.offsetX;
+	        this.light.cameraOffset.y = ev.offsetY;
+
+	        var targetAngle = this.game.math.angleBetween(
+	            ev.x, ev.y,
+	            this.gun.position.x, this.gun.position.y
+	        );
+
+	        if (this.game.math.degToRad(0) <= targetAngle ||
+	            this.game.math.degToRad(180) >= targetAngle) {
+
+	            this.gun.rotation = targetAngle;
+	        }
+	    },
+
 	    _onTimer: function () {
+
 	        this.batteryLevel -= 5;
 	        console.log('Called timer');
+
+	        this.soldiers.forEach(function (enemy) {
+
+	            enemy.body.velocity.x = this.rnd.integerInRange(-15, 15);
+	        }, this);
 	    },
 
 	    updateFPS: function () {
@@ -352,32 +404,32 @@
 	        }
 	    },
 
+	    updateScore: function () {
+
+	        this.scoreText.setText('Score: ' + this.score);
+	    },
+
 	    update: function () {
 
 	        // Clear the full-screen graphics
 	        this.graphics.clear();
 
-	//        console.log(this.game.input);
-
-	//        this.gun.rotation = ang;
-
-	        // Flashlight is dead so are you
+	        // Flashlight is dead, so are you
 	        if (this.batteryLevel <= 0) {
 
+	            this._saveScore();
 	            this.game.state.start('MainMenu');
 	        }
 
+	        this.updateScore();
 	        this.updateFPS();
 
-	        this.enemies.forEachDead(function (enemy) {
-	            this._spawnEnemy(enemy);
+	        // Spawn dead enemies
+	        this.soldiers.forEachDead(this._spawnEnemy, this);
+	        this.trucks.forEachDead(this._spawnEnemy, this);
+	        this.tanks.forEachDead(this._spawnEnemy, this);
 
-	//            enemy.alpha = 0;
-	//            enemy.bounce = this.game.add.tween(enemy);
-	//            enemy.bounce.to({ alpha: 0 }, Phaser.Easing.Linear.Out);
-	//            enemy.bounce.start();
-	        }, this);
-
+	        // Check for collisions
 	        this.bullets.forEachExists(function (bullet) {
 
 	            if (!bullet || !bullet.bulletShotAt) {
@@ -397,17 +449,6 @@
 	                }, this);
 	                bullet.bounce.start();
 
-	//                debugger;
-	//                bullet..bounce.onUpdateCallback(function (e) {
-	//                   console.log('E', e);
-	//                });
-	//                bullet.bounce.onCompleteCallback(function () {
-	//                    console.log('Completed');
-	//                });
-
-	//                this.game.add.tween(bullet.x)
-	//                    .to({ x: 0 }, 1000, Phaser.Easing.Linear.None, true);
-	////                    .start();
 	            }
 	        }, this);
 
@@ -417,10 +458,10 @@
 	                y = this.input.activePointer.position.y;
 
 	            this.shellEmitter.emitParticle();
-	//            this._updateCircle(x, y);
 
 	            this._fireGun(x, y);
 	        }
+
 	        this._drawHealth();
 	    },
 
@@ -437,30 +478,35 @@
 	        this.graphics.drawRect(
 	                this.game.width - 40,
 	                this.game.height - 130 + step, 20, 100 - step);
+
 	        this.graphics.endFill();
 	    },
 
 	    _spawnEnemy: function (enemy) {
 
+	        enemy.alpha = 0;
 	        enemy.enableBody = true;
+
 	        enemy.reset(
 	            this.rnd.integerInRange(0, this.game.width - 64),
 	            this.rnd.integerInRange(0, this.game.height - 64)
 	        );
+
+	        this.game.add.tween(enemy)
+	            .to({ alpha: 1 }, Phaser.Easing.Linear.Out)
+	            .start();
+
+
+	        if (enemy.key === "tank") {
+	            this.tanks._addSpriteMove(enemy);
+	        }
+
 	        enemy.health = this.ENEMY_HEALTH;
 	        this.game.physics.enable(enemy, Phaser.Physics.ARCADE);
 	    },
 
-	    _updateCircle: function (x, y) {
-
-	        // draw a circle
-	        this.graphics.lineStyle(0);
-	        this.graphics.beginFill(0xFFFF0B, 0.5);
-	        this.graphics.drawCircle(x, y, 50);
-	        this.graphics.endFill();
-	    },
-
 	    render: function () {
+
 	        this.game.debug.body(this.bullets);
 	    },
 
@@ -488,16 +534,44 @@
 	        );
 	        this.game.sound.play('shot');
 
-	        var collide = this.game.physics.arcade.overlap(bullet, this.enemies, this._collisionHandler, null, this);
+	        // Check for overlapping with bullet
+	        this.game.physics.arcade.overlap(bullet, this.soldiers, this._collisionHandler, null, this);
+	        this.game.physics.arcade.overlap(bullet, this.tanks, this._collisionHandler, null, this);
+	        this.game.physics.arcade.overlap(bullet, this.trucks, this._collisionHandler, null, this);
+	    },
+
+	    _saveScore: function () {
+
+	        if (!Storage.isSupported) {
+	            return;
+	        }
+
+	        Storage.set('defend.score', this.score || 0);
+	    },
+
+	    _setText: function (text) {
+
+	        this.infoText.alpha = 1;
+	        this.infoText.setText(text);
+	        this.infoText.x = this.game.width / 2;
+	        this.game.add.tween(this.infoText)
+	            .to({ alpha: 0, x: '+40' }, Phaser.Easing.Linear.Out)
+	            .start();
 	    },
 
 	    _collisionHandler: function (bullet, enemy) {
+
+	        var score = 10;
 
 	        console.log('Collison', enemy.health);
 	        enemy.damage(this.rnd.integerInRange(5, 15));
 
 	        if (enemy.health <= 0) {
+
+	            this.score += score;
 	            this.game.sound.play('dead');
+	            this._setText('+' + score + ' points');
+
 	            enemy.kill();
 	        }
 	    },
@@ -518,6 +592,193 @@
 	};
 
 	module.exports = Game;
+
+
+/***/ },
+/* 5 */
+/***/ function(module, exports, __webpack_require__) {
+
+	
+	var Storage = {
+
+	    isSupported: function () {
+
+	        try {
+	            return 'localStorage' in window &&
+	                window.localStorage !== null;
+	        } catch (e) {
+
+	            return false;
+	        }
+	    },
+
+	    get: function (key) {
+
+	        return localStorage.getItem(key);
+	    },
+
+	    set: function (key, value) {
+
+	        return localStorage.setItem(key, value);
+	    }
+
+	};
+
+	module.exports = Storage;
+
+
+/***/ },
+/* 6 */
+/***/ function(module, exports, __webpack_require__) {
+
+	
+	var EnemyGroup = __webpack_require__(9);
+
+	var SoldierGroup = function (game) {
+	    this.AMMOUNT = 5;
+
+	    EnemyGroup.call(this, game);
+
+	    this.key = 'soldier';
+	    this.setAll('enableBody', true);
+	    this.createMultiple(this.AMMOUNT, 'soldier');
+	};
+
+	SoldierGroup.prototype = Object.create(EnemyGroup.prototype);
+	SoldierGroup.prototype.construct = SoldierGroup;
+
+	module.exports = SoldierGroup;
+
+
+/***/ },
+/* 7 */
+/***/ function(module, exports, __webpack_require__) {
+
+	
+	var EnemyGroup = __webpack_require__(9);
+
+	var TruckGroup = function (game) {
+	    this.AMMOUNT = 1;
+
+	    EnemyGroup.call(this, game);
+
+	    this.key = 'truck';
+	    this.setAll('enableBody', true);
+	    this.createMultiple(this.AMMOUNT, 'truck');
+	};
+
+	TruckGroup.prototype = Object.create(EnemyGroup.prototype);
+	TruckGroup.prototype.construct = TruckGroup;
+
+	module.exports = TruckGroup;
+
+
+/***/ },
+/* 8 */
+/***/ function(module, exports, __webpack_require__) {
+
+	
+	var EnemyGroup = __webpack_require__(9);
+
+	var TankGroup = function (game) {
+	    this.AMMOUNT = 2;
+
+	    EnemyGroup.call(this, game);
+
+	    this.key = 'tank';
+	    this.setAll('enableBody', true);
+	    this.setAll('outOfBoundsKill', true);
+
+	    this.createMultiple(this.AMMOUNT, 'tank');
+	};
+
+	TankGroup.prototype = Object.create(EnemyGroup.prototype);
+	TankGroup.prototype.construct = TankGroup;
+
+	TankGroup.prototype.moveStep = function () {
+
+	    this.forEachDead(this._addSpriteMove, this);
+	};
+
+	TankGroup.prototype._addSpriteMove = function (enemy) {
+
+	    var vanHalen = function (v) {
+
+	        return Math.sin(v * Math.PI) * 1;
+	    };
+
+	    var dir  = this.game.math.chanceRoll();
+	    var sx, sy, ex, ey;
+
+	    enemy.move = this.game.add.tween(enemy);
+	    enemy.jump = this.game.add.tween(enemy);
+
+	    if (dir) {
+	        sx = 0;
+	        sy = this.game.rnd.integerInRange(50, this.game.height - 75);
+	        ex = this.game.width;
+	        enemy.scale.x *= -1;
+	    }
+	    else {
+	        sx = this.game.width;
+	        sy = this.game.rnd.integerInRange(50, this.game.height - 75);
+	        ex = 0;
+	    }
+
+	    enemy.x = sx;
+	    enemy.move.to({ x: ex }, 15 * 1000);
+
+	    enemy.jump.to({ y: sy }, 15 * 1000, vanHalen, true, 0, Number.MAX_VALUE, 0);
+	    enemy.move.start();
+	};
+
+	module.exports = TankGroup;
+
+
+/***/ },
+/* 9 */
+/***/ function(module, exports, __webpack_require__) {
+
+	
+	var EnemyGroup = function (game, key) {
+
+	    Phaser.Group.call(this, game);
+
+	    this.key = key;
+	    this.ENEMY_HEALTH = 100;
+	    this.REWARD = 10;
+	    this.health = 0;
+	};
+
+	EnemyGroup.prototype = Object.create(Phaser.Group.prototype);
+	EnemyGroup.prototype.construct = EnemyGroup;
+
+	EnemyGroup.prototype.spawn = function (enemy) {
+
+	    enemy.alpha = 0;
+	    enemy.enableBody = true;
+
+	    enemy.reset(
+	        this.game.rnd.integerInRange(0, this.game.width - 64),
+	        this.game.rnd.integerInRange(0, this.game.height - 64)
+	    );
+
+	    this.game.add.tween(enemy)
+	        .to({ alpha: 1 }, Phaser.Easing.Linear.Out)
+	        .start();
+
+	    enemy.health = this.ENEMY_HEALTH;
+	    this.game.physics.enable(enemy, Phaser.Physics.ARCADE);
+
+	};
+
+	EnemyGroup.prototype.spawnAll = function () {
+
+	    this.forEachDead(this._spawn, this);
+	};
+
+	module.exports = EnemyGroup;
+
 
 /***/ }
 /******/ ])
