@@ -32,6 +32,8 @@ Game.prototype = {
         this.background = this.game.add.sprite(this.game.world.centerX, this.game.world.centerY, 'background');
         this.background.anchor.set(0.5, 0.5);
 
+        this._generateTerrain();
+
         // Tanks pool
         this.tanks = new TankGroup(this.game);
         this.tanks.spawnAll();
@@ -216,6 +218,28 @@ Game.prototype = {
         }
 
         this._drawHealth();
+    },
+
+    _generateTerrain: function () {
+
+        var terrainGroup = this.game.add.group();
+        var spriteNames = [ 'tree', 'evergreen', 'tree1' ];
+        var x, y;
+
+        terrainGroup.z = 3;
+        spriteNames.forEach(function (name) {
+
+            var len = this.game.rnd.integerInRange(1, 4);
+
+            for (var i = 0; i < len; i++) {
+                x = this.game.rnd.integerInRange(0, this.game.width);
+                y = this.game.rnd.integerInRange(100, this.game.height - 100);
+
+                terrainGroup.add(new Phaser.Sprite(this.game, x, y, name));
+            }
+        }, this);
+
+        return terrainGroup;
     },
 
     _drawHealth: function () {

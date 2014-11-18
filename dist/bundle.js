@@ -53,12 +53,13 @@
 	var Game = __webpack_require__(4);
 
 	var game = new Phaser.Game(800, 600, Phaser.CANVAS, 'game');
-	game.state.add('Boot', Boot);
+
 	game.state.add('Preloader', Preloader);
+	game.state.add('Boot', Boot);
 	game.state.add('MainMenu', MainMenu);
 	game.state.add('Game', Game);
 
-	game.state.start('Boot');
+	game.state.start('Preloader');
 
 
 /***/ },
@@ -74,44 +75,7 @@
 	Boot.prototype = {
 
 	    preload: function() {
-	        var imgP = './img/';
 
-	        this.load.image('preloaderBg',  imgP + 'loading-bg.png');
-	        this.load.image('preloaderBar', imgP + 'loading-bar.png');
-	        this.load.image('bullet',       imgP + 'shot.png');
-	        this.load.image('bullet-shell', imgP + 'bullet.png');
-	        this.load.image('soldier',      imgP + 'soldier.png');
-	        this.load.image('light',        imgP + 'light.png');
-	        this.load.image('flashlight',   imgP + 'flashlight.png');
-	        this.load.image('gun',          imgP + 'gun.png');
-	        this.load.image('tank',         imgP + 'tank.png');
-	        this.load.image('truck',        imgP + 'truck.png');
-	        this.load.image('evergreen',    imgP + 'evergreen.png');
-	        this.load.image('tree',         imgP + 'tree.png');
-	        this.load.image('background',   imgP + 'background.jpg');
-	        this.load.image('main-theme',   imgP + 'main_theme.jpg');
-
-	        // Button
-	        this.load.image('new-game', imgP + 'button/new_game.png');
-	//        this.load.image('new-game-hover', 'img/button/new_game_hover.png');
-	//        this.load.image('new-game-click', 'img/button/new_game_click.png');
-
-	        this.load.image('tutorial', imgP + 'button/tutorial.png');
-	//        this.load.image('tutorial-hover', 'img/button/tutorial_hover.png');
-	//        this.load.image('tutorial-click', 'img/button/tutorial_click.png');
-
-	        this.load.image('fullscreen', imgP + 'button/fullscreen.png');
-	//        this.load.image('fullscreen-hover', 'img/button/fullscreen_hover.png');
-	//        this.load.image('fullscreen-click', 'img/button/fullscreen_click.png');
-
-
-	//        this.load.image('tutorial', 'img/button/tutorial.png');
-	//        this.load.image('tutorial-hover', 'img/button/tutorial_hover.png');
-
-	        this.load.spritesheet('mute', 'img/mute.png', 34, 34, 3);
-
-	        this.load.audio('shot', ['snd/shot.wav']);
-	        this.load.audio('dead', ['snd/dead.wav']);
 	    },
 
 	    create: function() {
@@ -160,6 +124,45 @@
 	//        this.load.spritesheet('button-audio', 'img/button-audio.png', 35, 35);
 	//
 
+	        var imgP = './img/';
+
+	        this.load.image('preloaderBg',  imgP + 'loading-bg.png');
+	        this.load.image('preloaderBar', imgP + 'loading-bar.png');
+	        this.load.image('bullet',       imgP + 'shot.png');
+	        this.load.image('bullet-shell', imgP + 'bullet.png');
+	        this.load.image('soldier',      imgP + 'soldier.png');
+	        this.load.image('light',        imgP + 'light.png');
+	        this.load.image('flashlight',   imgP + 'flashlight.png');
+	        this.load.image('gun',          imgP + 'gun.png');
+	        this.load.image('tank',         imgP + 'tank.png');
+	        this.load.image('truck',        imgP + 'truck.png');
+	        this.load.image('evergreen',    imgP + 'evergreen.png');
+	        this.load.image('tree',         imgP + 'tree.png');
+	        this.load.image('tree1',        imgP + 'tree1.png');
+	        this.load.image('background',   imgP + 'background.jpg');
+	        this.load.image('main-theme',   imgP + 'main_theme.jpg');
+
+	        // Button
+	        this.load.image('new-game', imgP + 'button/new_game.png');
+	//        this.load.image('new-game-hover', 'img/button/new_game_hover.png');
+	//        this.load.image('new-game-click', 'img/button/new_game_click.png');
+
+	        this.load.image('tutorial', imgP + 'button/tutorial.png');
+	//        this.load.image('tutorial-hover', 'img/button/tutorial_hover.png');
+	//        this.load.image('tutorial-click', 'img/button/tutorial_click.png');
+
+	        this.load.image('fullscreen', imgP + 'button/fullscreen.png');
+	//        this.load.image('fullscreen-hover', 'img/button/fullscreen_hover.png');
+	//        this.load.image('fullscreen-click', 'img/button/fullscreen_click.png');
+
+
+	//        this.load.image('tutorial', 'img/button/tutorial.png');
+	//        this.load.image('tutorial-hover', 'img/button/tutorial_hover.png');
+
+	        this.load.spritesheet('mute', 'img/mute.png', 34, 34, 3);
+
+	        this.load.audio('shot', ['snd/shot.wav']);
+	        this.load.audio('dead', ['snd/dead.wav']);
 	    },
 	    create: function() {
 
@@ -169,6 +172,7 @@
 	};
 
 	module.exports = Preloader;
+
 
 /***/ },
 /* 3 */
@@ -278,6 +282,8 @@
 	        // Add background
 	        this.background = this.game.add.sprite(this.game.world.centerX, this.game.world.centerY, 'background');
 	        this.background.anchor.set(0.5, 0.5);
+
+	        this._generateTerrain();
 
 	        // Tanks pool
 	        this.tanks = new TankGroup(this.game);
@@ -463,6 +469,28 @@
 	        }
 
 	        this._drawHealth();
+	    },
+
+	    _generateTerrain: function () {
+
+	        var terrainGroup = this.game.add.group();
+	        var spriteNames = [ 'tree', 'evergreen', 'tree1' ];
+	        var x, y;
+
+	        terrainGroup.z = 3;
+	        spriteNames.forEach(function (name) {
+
+	            var len = this.game.rnd.integerInRange(1, 4);
+
+	            for (var i = 0; i < len; i++) {
+	                x = this.game.rnd.integerInRange(0, this.game.width);
+	                y = this.game.rnd.integerInRange(100, this.game.height - 100);
+
+	                terrainGroup.add(new Phaser.Sprite(this.game, x, y, name));
+	            }
+	        }, this);
+
+	        return terrainGroup;
 	    },
 
 	    _drawHealth: function () {
