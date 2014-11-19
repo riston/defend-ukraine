@@ -16,7 +16,6 @@ MainMenu.prototype = {
         this.game.scale.enterFullScreen.add(this._onEnterFullScreen, this);
         this.game.scale.leaveFullScreen.add(this._onLeaveFullScreen, this);
 
-
         // Add background
         this.background = this.game.add.sprite(this.game.world.centerX, this.game.world.centerY, 'main-theme');
         this.background.anchor.set(0.5, 0.47);
@@ -53,6 +52,8 @@ MainMenu.prototype = {
     onFullscreen: function () {
 
         this.game.scale.startFullScreen();
+        this.game.stage.scale.pageAlignHorizontally = true;
+        this.game.stage.scale.pageAlignVertically = true;
     },
 
     onStartClick: function () {

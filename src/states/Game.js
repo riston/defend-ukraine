@@ -64,6 +64,8 @@ Game.prototype = {
         // Add light
         this.light = this.game.add.sprite(100, 200, 'light');
         this.light.anchor = new Phaser.Point(0.5, 0.5);
+        // this.light.scale(0.4);
+
         this.light.fixedToCamera = true;
         this.game.physics.enable(this.light, Phaser.Physics.ARCADE);
 
@@ -118,9 +120,6 @@ Game.prototype = {
             fill: '#ffffff',
         });
 
-        // Change camera location if mouse has moved
-        this.game.input.mouse.onMouseMove = this._onMouseMove.bind(this);
-
         this.graphics = this.game.add.graphics(0, 0);
     },
 
@@ -129,16 +128,16 @@ Game.prototype = {
         this.light.cameraOffset.x = ev.offsetX;
         this.light.cameraOffset.y = ev.offsetY;
 
-        var targetAngle = this.game.math.angleBetween(
-            ev.x, ev.y,
-            this.gun.position.x, this.gun.position.y
-        );
+        // var targetAngle = this.game.math.angleBetween(
+        //     ev.x, ev.y,
+        //     this.gun.position.x, this.gun.position.y
+        // );
 
-        if (this.game.math.degToRad(0) <= targetAngle ||
-            this.game.math.degToRad(180) >= targetAngle) {
+        // if (this.game.math.degToRad(0) <= targetAngle ||
+        //     this.game.math.degToRad(180) >= targetAngle) {
 
-            this.gun.rotation = targetAngle;
-        }
+        //     this.gun.rotation = targetAngle;
+        // }
     },
 
     _onTimer: function () {
@@ -165,6 +164,16 @@ Game.prototype = {
     },
 
     update: function () {
+
+        // Follow the light
+        this.light.cameraOffset.x = this.game.input.x;
+        this.light.cameraOffset.y = this.game.input.y;
+
+        var targetAngle = this.game.math.angleBetween(
+            this.game.input.x, this.game.input.y,
+            this.gun.position.x, this.gun.position.y
+        );
+        this.gun.rotation = targetAngle;
 
         // Clear the full-screen graphics
         this.graphics.clear();
@@ -283,8 +292,6 @@ Game.prototype = {
     },
 
     render: function () {
-
-        this.game.debug.body(this.bullets);
     },
 
     _fireGun: function (x, y) {

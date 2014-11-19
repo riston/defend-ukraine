@@ -6,6 +6,11 @@ var Preloader = function (game) {}
 
 Preloader.prototype = {
     preload: function() {
+        var imgP = './img/';
+
+        this.load.image('preloaderBg',  imgP + 'loading-bg.png');
+        this.load.image('preloaderBar', imgP + 'loading-bar.png');
+
         this.game.stage.backgroundColor = '#16181a';
         this.preloadBg = this.add.sprite((320-297)/2, (480-145)/2, 'preloaderBg');
         this.preloadBar = this.add.sprite((320-158)/2, (480-50)/2, 'preloaderBar');
@@ -26,10 +31,7 @@ Preloader.prototype = {
 //        this.load.spritesheet('button-audio', 'img/button-audio.png', 35, 35);
 //
 
-        var imgP = './img/';
 
-        this.load.image('preloaderBg',  imgP + 'loading-bg.png');
-        this.load.image('preloaderBar', imgP + 'loading-bar.png');
         this.load.image('bullet',       imgP + 'shot.png');
         this.load.image('bullet-shell', imgP + 'bullet.png');
         this.load.image('soldier',      imgP + 'soldier.png');

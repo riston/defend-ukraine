@@ -104,6 +104,11 @@
 
 	Preloader.prototype = {
 	    preload: function() {
+	        var imgP = './img/';
+
+	        this.load.image('preloaderBg',  imgP + 'loading-bg.png');
+	        this.load.image('preloaderBar', imgP + 'loading-bar.png');
+
 	        this.game.stage.backgroundColor = '#16181a';
 	        this.preloadBg = this.add.sprite((320-297)/2, (480-145)/2, 'preloaderBg');
 	        this.preloadBar = this.add.sprite((320-158)/2, (480-50)/2, 'preloaderBar');
@@ -124,10 +129,7 @@
 	//        this.load.spritesheet('button-audio', 'img/button-audio.png', 35, 35);
 	//
 
-	        var imgP = './img/';
 
-	        this.load.image('preloaderBg',  imgP + 'loading-bg.png');
-	        this.load.image('preloaderBar', imgP + 'loading-bar.png');
 	        this.load.image('bullet',       imgP + 'shot.png');
 	        this.load.image('bullet-shell', imgP + 'bullet.png');
 	        this.load.image('soldier',      imgP + 'soldier.png');
@@ -196,7 +198,6 @@
 	        this.game.scale.enterFullScreen.add(this._onEnterFullScreen, this);
 	        this.game.scale.leaveFullScreen.add(this._onLeaveFullScreen, this);
 
-
 	        // Add background
 	        this.background = this.game.add.sprite(this.game.world.centerX, this.game.world.centerY, 'main-theme');
 	        this.background.anchor.set(0.5, 0.47);
@@ -233,6 +234,8 @@
 	    onFullscreen: function () {
 
 	        this.game.scale.startFullScreen();
+	        this.game.stage.scale.pageAlignHorizontally = true;
+	        this.game.stage.scale.pageAlignVertically = true;
 	    },
 
 	    onStartClick: function () {
@@ -315,6 +318,8 @@
 	        // Add light
 	        this.light = this.game.add.sprite(100, 200, 'light');
 	        this.light.anchor = new Phaser.Point(0.5, 0.5);
+	        // this.light.scale(0.4);
+
 	        this.light.fixedToCamera = true;
 	        this.game.physics.enable(this.light, Phaser.Physics.ARCADE);
 
@@ -369,9 +374,6 @@
 	            fill: '#ffffff',
 	        });
 
-	        // Change camera location if mouse has moved
-	        this.game.input.mouse.onMouseMove = this._onMouseMove.bind(this);
-
 	        this.graphics = this.game.add.graphics(0, 0);
 	    },
 
@@ -380,16 +382,16 @@
 	        this.light.cameraOffset.x = ev.offsetX;
 	        this.light.cameraOffset.y = ev.offsetY;
 
-	        var targetAngle = this.game.math.angleBetween(
-	            ev.x, ev.y,
-	            this.gun.position.x, this.gun.position.y
-	        );
+	        // var targetAngle = this.game.math.angleBetween(
+	        //     ev.x, ev.y,
+	        //     this.gun.position.x, this.gun.position.y
+	        // );
 
-	        if (this.game.math.degToRad(0) <= targetAngle ||
-	            this.game.math.degToRad(180) >= targetAngle) {
+	        // if (this.game.math.degToRad(0) <= targetAngle ||
+	        //     this.game.math.degToRad(180) >= targetAngle) {
 
-	            this.gun.rotation = targetAngle;
-	        }
+	        //     this.gun.rotation = targetAngle;
+	        // }
 	    },
 
 	    _onTimer: function () {
@@ -416,6 +418,16 @@
 	    },
 
 	    update: function () {
+
+	        // Follow the light
+	        this.light.cameraOffset.x = this.game.input.x;
+	        this.light.cameraOffset.y = this.game.input.y;
+
+	        var targetAngle = this.game.math.angleBetween(
+	            this.game.input.x, this.game.input.y,
+	            this.gun.position.x, this.gun.position.y
+	        );
+	        this.gun.rotation = targetAngle;
 
 	        // Clear the full-screen graphics
 	        this.graphics.clear();
@@ -534,8 +546,6 @@
 	    },
 
 	    render: function () {
-
-	        this.game.debug.body(this.bullets);
 	    },
 
 	    _fireGun: function (x, y) {
