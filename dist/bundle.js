@@ -52,7 +52,7 @@
 	var MainMenu = __webpack_require__(3);
 	var Game = __webpack_require__(4);
 
-	var game = new Phaser.Game(800, 600, Phaser.CANVAS, 'game');
+	var game = new Phaser.Game(800, 600, Phaser.AUTO, 'game');
 
 	game.state.add('Preloader', Preloader);
 	game.state.add('Boot', Boot);
