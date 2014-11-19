@@ -123,23 +123,6 @@ Game.prototype = {
         this.graphics = this.game.add.graphics(0, 0);
     },
 
-    _onMouseMove: function (ev) {
-
-        this.light.cameraOffset.x = ev.offsetX;
-        this.light.cameraOffset.y = ev.offsetY;
-
-        // var targetAngle = this.game.math.angleBetween(
-        //     ev.x, ev.y,
-        //     this.gun.position.x, this.gun.position.y
-        // );
-
-        // if (this.game.math.degToRad(0) <= targetAngle ||
-        //     this.game.math.degToRad(180) >= targetAngle) {
-
-        //     this.gun.rotation = targetAngle;
-        // }
-    },
-
     _onTimer: function () {
 
         this.batteryLevel -= 5;

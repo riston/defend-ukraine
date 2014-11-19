@@ -59,7 +59,7 @@
 	game.state.add('MainMenu', MainMenu);
 	game.state.add('Game', Game);
 
-	game.state.start('Preloader');
+	game.state.start('Boot');
 
 
 /***/ },
@@ -75,15 +75,18 @@
 	Boot.prototype = {
 
 	    preload: function() {
+	        var imgP = './img/';
 
+	        this.load.image('preloaderBg',  imgP + 'loading-bg.png');
+	        this.load.image('preloaderBar', imgP + 'loading-bar.png');
 	    },
 
 	    create: function() {
 	        this.game.input.maxPointers = 1;
 
-	//        this.game.stage.scaleMode = Phaser.StageScaleMode.SHOW_ALL;
-	//        this.game.stage.scale.pageAlignHorizontally = true;
-	//        this.game.stage.scale.pageAlignVertically = true;
+	        // this.game.stage.scaleMode = Phaser.StageScaleMode.SHOW_ALL;
+	        this.game.stage.scale.pageAlignHorizontally = true;
+	        this.game.stage.scale.pageAlignVertically = true;
 
 	        this.game.state.start('Preloader');
 	    }
@@ -105,31 +108,14 @@
 	Preloader.prototype = {
 	    preload: function() {
 	        var imgP = './img/';
-
-	        this.load.image('preloaderBg',  imgP + 'loading-bg.png');
-	        this.load.image('preloaderBar', imgP + 'loading-bar.png');
-
+	        var cX = this.game.world.centerX;
+	        var cY = this.game.world.centerY;
 	        this.game.stage.backgroundColor = '#16181a';
-	        this.preloadBg = this.add.sprite((320-297)/2, (480-145)/2, 'preloaderBg');
-	        this.preloadBar = this.add.sprite((320-158)/2, (480-50)/2, 'preloaderBar');
+
+	        this.preloadBg = this.add.sprite(cX - (297 / 2), cY - (145 / 2) + 200, 'preloaderBg');
+	        this.preloadBar = this.add.sprite(cX - (158 / 2), cY - (50 / 2) + 200, 'preloaderBar');
 
 	        this.load.setPreloadSprite(this.preloadBar);
-	//        this.load.image('ball', 'img/ball.png');
-	//        this.load.image('hole', 'img/hole.png');
-	//        this.load.image('element-w', 'img/element-w.png');
-	//        this.load.image('element-h', 'img/element-h.png');
-	//        this.load.image('panel', 'img/panel.png');
-	//        this.load.image('title', 'img/title.png');
-	//        this.load.image('button-pause', 'img/button-pause.png');
-	//        this.load.image('button-start', 'img/button-start.png');
-	//        this.load.image('screen-bg', 'img/screen-bg.png');
-	//        this.load.image('screen-mainmenu', 'img/screen-mainmenu.png');
-	//        this.load.image('screen-howtoplay', 'img/screen-howtoplay.png');
-	//
-	//        this.load.spritesheet('button-audio', 'img/button-audio.png', 35, 35);
-	//
-
-
 	        this.load.image('bullet',       imgP + 'shot.png');
 	        this.load.image('bullet-shell', imgP + 'bullet.png');
 	        this.load.image('soldier',      imgP + 'soldier.png');
@@ -165,10 +151,10 @@
 
 	        this.load.audio('shot', ['snd/shot.wav']);
 	        this.load.audio('dead', ['snd/dead.wav']);
+
 	    },
 	    create: function() {
 
-	//        this.game.state.start("Game");
 	        this.game.state.start('MainMenu');
 	    }
 	};
@@ -375,23 +361,6 @@
 	        });
 
 	        this.graphics = this.game.add.graphics(0, 0);
-	    },
-
-	    _onMouseMove: function (ev) {
-
-	        this.light.cameraOffset.x = ev.offsetX;
-	        this.light.cameraOffset.y = ev.offsetY;
-
-	        // var targetAngle = this.game.math.angleBetween(
-	        //     ev.x, ev.y,
-	        //     this.gun.position.x, this.gun.position.y
-	        // );
-
-	        // if (this.game.math.degToRad(0) <= targetAngle ||
-	        //     this.game.math.degToRad(180) >= targetAngle) {
-
-	        //     this.gun.rotation = targetAngle;
-	        // }
 	    },
 
 	    _onTimer: function () {

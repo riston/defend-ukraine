@@ -13,4 +13,4 @@ game.state.add('Boot', Boot);
 game.state.add('MainMenu', MainMenu);
 game.state.add('Game', Game);
 
-game.state.start('Preloader');
+game.state.start('Boot');
