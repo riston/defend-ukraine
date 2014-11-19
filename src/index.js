@@ -6,7 +6,7 @@ var Preloader = require('./states/Preloader');
 var MainMenu = require('./states/MainMenu');
 var Game = require('./states/Game');
 
-var game = new Phaser.Game(800, 600, Phaser.CANVAS, 'game');
+var game = new Phaser.Game(800, 600, Phaser.AUTO, 'game');
 
 game.state.add('Preloader', Preloader);
 game.state.add('Boot', Boot);
