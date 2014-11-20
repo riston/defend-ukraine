@@ -126,6 +126,7 @@
 	        this.load.image('truck',        imgP + 'truck.png');
 	        this.load.image('evergreen',    imgP + 'evergreen.png');
 	        this.load.image('tree',         imgP + 'tree.png');
+	        this.load.image('battery',      imgP + 'battery.png');
 	        this.load.image('tree1',        imgP + 'tree1.png');
 	        this.load.image('background',   imgP + 'background.jpg');
 	        this.load.image('main-theme',   imgP + 'main_theme.jpg');
@@ -245,6 +246,7 @@
 	var SoldierGroup = __webpack_require__(6);
 	var TruckGroup = __webpack_require__(7);
 	var TankGroup = __webpack_require__(8);
+	var BatteryGroup = __webpack_require__(10);
 
 	var Game = function(game) {
 
@@ -286,6 +288,9 @@
 	        // Soldiers pool
 	        this.soldiers = new SoldierGroup(this.game);
 	        this.soldiers.spawnAll();
+
+	        // Battery
+	        this.batteries = new BatteryGroup(this.game);
 
 	        // Bullets pool
 	        this.bullets = this.add.group();
@@ -365,7 +370,7 @@
 
 	    _onTimer: function () {
 
-	        this.batteryLevel -= 5;
+	        this.batteryLevel -= 3;
 	        console.log('Called timer');
 
 	        this.soldiers.forEach(function (enemy) {
@@ -543,8 +548,9 @@
 
 	        // Check for overlapping with bullet
 	        this.game.physics.arcade.overlap(bullet, this.soldiers, this._collisionHandler, null, this);
-	        this.game.physics.arcade.overlap(bullet, this.tanks, this._collisionHandler, null, this);
 	        this.game.physics.arcade.overlap(bullet, this.trucks, this._collisionHandler, null, this);
+	        this.game.physics.arcade.overlap(bullet, this.tanks, this._collisionHandler, null, this);
+	        this.game.physics.arcade.overlap(bullet, this.batteries, this._batteryCollision, null, this);
 	    },
 
 	    _saveScore: function () {
@@ -567,7 +573,6 @@
 	    },
 
 	    _collisionHandler: function (bullet, enemy) {
-
 	        var score = 10;
 
 	        console.log('Collison', enemy.health);
@@ -579,8 +584,60 @@
 	            this.game.sound.play('dead');
 	            this._setText('+' + score + ' points');
 
+	            if ((enemy.key === "tank" || enemy.key === "truck")
+	                && this.game.math.chanceRoll(20)) {
+
+	                this.batteries.spawn(
+	                    enemy.x + enemy.width / 2,
+	                    enemy.y + enemy.height / 2);
+	            }
+
 	            enemy.kill();
 	        }
+	    },
+
+	    _batteryCollision: function (bullet, battery) {
+	        var boost = 15;
+
+	        if (this.batteryLevel + boost > 100) {
+
+	            this.batteryLevel = 100;
+	        }
+	        this.batteryLevel += boost;
+
+	        var angle = this.game.add.tween(battery);
+
+	        angle.to({ angle: '+360' }, 1000, Phaser.Easing.Linear.Out);
+	        angle.onComplete.add(function () {
+
+	            var scale = this.game.add.tween(battery.scale);
+	            scale.to({ x: 3, y: 3});
+
+	            var alpha = this.game.add.tween(battery);
+	            alpha.to({ alpha: 0});
+	            alpha.onComplete.add(function () {
+
+	                // Remove battery if not visible
+	                battery.kill();
+
+	                // Reset the values
+	                battery.angle = 0;
+	                battery.alpha = 1;
+	                battery.scale.x = 1;
+	                battery.scale.y = 1;
+
+	            }, this);
+
+	            scale.start();
+	            alpha.start();
+
+	        }, this);
+
+	        angle.start();
+	    },
+
+	    _addBattery: function (x, y) {
+	        var battery = this.game.add.sprite(x, y, 'battery');
 	    },
 
 	    _onMuteClick: function () {
@@ -785,6 +842,46 @@
 	};
 
 	module.exports = EnemyGroup;
+
+
+/***/ },
+/* 10 */
+/***/ function(module, exports, __webpack_require__) {
+
+	
+	var BatteryGroup = function (game, key) {
+
+	    Phaser.Group.call(this, game);
+
+	    this.AMMOUNT = 10;
+	    this.key = 'battery';
+	    this.createMultiple(this.AMMOUNT, 'battery');
+	};
+
+	BatteryGroup.prototype = Object.create(Phaser.Group.prototype);
+	BatteryGroup.prototype.construct = BatteryGroup;
+
+	BatteryGroup.prototype.spawn = function (x, y) {
+
+	    var battery = this.getFirstDead();
+
+	    if (!battery) {
+	        return;
+	    }
+
+	    battery.reset(x, y);
+
+	    battery.anchor.set(0.5, 0.5);
+	    this.game.physics.enable(battery, Phaser.Physics.ARCADE);
+	};
+
+
+	BatteryGroup.prototype.spawnAll = function () {
+
+	    this.forEachDead(this._spawn, this);
+	};
+
+	module.exports = BatteryGroup;
 
 
 /***/ }

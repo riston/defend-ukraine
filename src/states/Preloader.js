@@ -25,6 +25,7 @@ Preloader.prototype = {
         this.load.image('truck',        imgP + 'truck.png');
         this.load.image('evergreen',    imgP + 'evergreen.png');
         this.load.image('tree',         imgP + 'tree.png');
+        this.load.image('battery',      imgP + 'battery.png');
         this.load.image('tree1',        imgP + 'tree1.png');
         this.load.image('background',   imgP + 'background.jpg');
         this.load.image('main-theme',   imgP + 'main_theme.jpg');

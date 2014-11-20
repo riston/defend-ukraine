@@ -5,6 +5,7 @@ var Storage = require('../Storage');
 var SoldierGroup = require('../groups/SoldierGroup');
 var TruckGroup = require('../groups/TruckGroup');
 var TankGroup = require('../groups/TankGroup');
+var BatteryGroup = require('../groups/BatteryGroup');
 
 var Game = function(game) {
 
@@ -46,6 +47,9 @@ Game.prototype = {
         // Soldiers pool
         this.soldiers = new SoldierGroup(this.game);
         this.soldiers.spawnAll();
+
+        // Battery
+        this.batteries = new BatteryGroup(this.game);
 
         // Bullets pool
         this.bullets = this.add.group();
@@ -125,7 +129,7 @@ Game.prototype = {
 
     _onTimer: function () {
 
-        this.batteryLevel -= 5;
+        this.batteryLevel -= 3;
         console.log('Called timer');
 
         this.soldiers.forEach(function (enemy) {
@@ -303,8 +307,9 @@ Game.prototype = {
 
         // Check for overlapping with bullet
         this.game.physics.arcade.overlap(bullet, this.soldiers, this._collisionHandler, null, this);
-        this.game.physics.arcade.overlap(bullet, this.tanks, this._collisionHandler, null, this);
         this.game.physics.arcade.overlap(bullet, this.trucks, this._collisionHandler, null, this);
+        this.game.physics.arcade.overlap(bullet, this.tanks, this._collisionHandler, null, this);
+        this.game.physics.arcade.overlap(bullet, this.batteries, this._batteryCollision, null, this);
     },
 
     _saveScore: function () {
@@ -327,7 +332,6 @@ Game.prototype = {
     },
 
     _collisionHandler: function (bullet, enemy) {
-
         var score = 10;
 
         console.log('Collison', enemy.health);
@@ -339,8 +343,60 @@ Game.prototype = {
             this.game.sound.play('dead');
             this._setText('+' + score + ' points');
 
+            if ((enemy.key === "tank" || enemy.key === "truck")
+                && this.game.math.chanceRoll(20)) {
+
+                this.batteries.spawn(
+                    enemy.x + enemy.width / 2,
+                    enemy.y + enemy.height / 2);
+            }
+
             enemy.kill();
         }
+    },
+
+    _batteryCollision: function (bullet, battery) {
+        var boost = 15;
+
+        if (this.batteryLevel + boost > 100) {
+
+            this.batteryLevel = 100;
+        }
+        this.batteryLevel += boost;
+
+        var angle = this.game.add.tween(battery);
+
+        angle.to({ angle: '+360' }, 1000, Phaser.Easing.Linear.Out);
+        angle.onComplete.add(function () {
+
+            var scale = this.game.add.tween(battery.scale);
+            scale.to({ x: 3, y: 3});
+
+            var alpha = this.game.add.tween(battery);
+            alpha.to({ alpha: 0});
+            alpha.onComplete.add(function () {
+
+                // Remove battery if not visible
+                battery.kill();
+
+                // Reset the values
+                battery.angle = 0;
+                battery.alpha = 1;
+                battery.scale.x = 1;
+                battery.scale.y = 1;
+
+            }, this);
+
+            scale.start();
+            alpha.start();
+
+        }, this);
+
+        angle.start();
+    },
+
+    _addBattery: function (x, y) {
+        var battery = this.game.add.sprite(x, y, 'battery');
     },
 
     _onMuteClick: function () {
