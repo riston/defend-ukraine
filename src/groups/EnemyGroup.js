@@ -7,6 +7,9 @@ var EnemyGroup = function (game, key) {
     this.ENEMY_HEALTH = 100;
     this.REWARD = 10;
     this.health = 0;
+
+    this.setAll('anchor.x', 0.5);
+    this.setAll('anchor.y', 0.5);
 };
 
 EnemyGroup.prototype = Object.create(Phaser.Group.prototype);
