@@ -31,17 +31,19 @@ Preloader.prototype = {
         this.load.image('main-theme',   imgP + 'main_theme.jpg');
 
         // Button
+        this.load.image('play', imgP + 'button/play.png');
+
         this.load.image('new-game', imgP + 'button/new_game.png');
-//        this.load.image('new-game-hover', 'img/button/new_game_hover.png');
-//        this.load.image('new-game-click', 'img/button/new_game_click.png');
+        this.load.image('new-game-hover', imgP + 'button/new_game_hover.png');
+        this.load.image('new-game-click', imgP + 'button/new_game_click.png');
 
         this.load.image('tutorial', imgP + 'button/tutorial.png');
-//        this.load.image('tutorial-hover', 'img/button/tutorial_hover.png');
-//        this.load.image('tutorial-click', 'img/button/tutorial_click.png');
+        this.load.image('tutorial-hover', imgP + 'button/tutorial_hover.png');
+        this.load.image('tutorial-click', imgP + 'button/tutorial_click.png');
 
         this.load.image('fullscreen', imgP + 'button/fullscreen.png');
-//        this.load.image('fullscreen-hover', 'img/button/fullscreen_hover.png');
-//        this.load.image('fullscreen-click', 'img/button/fullscreen_click.png');
+        this.load.image('fullscreen-hover', imgP + 'button/fullscreen_hover.png');
+        this.load.image('fullscreen-click', imgP + 'button/fullscreen_click.png');
 
 
 //        this.load.image('tutorial', 'img/button/tutorial.png');

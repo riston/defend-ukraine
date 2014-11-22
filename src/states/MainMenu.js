@@ -12,6 +12,8 @@ MainMenu.prototype = {
         var y = 260;
 
         this.game.scale.fullScreenScaleMode = Phaser.ScaleManager.SHOW_ALL;
+        this.game.stage.scale.pageAlignHorizontally = true;
+        this.game.stage.scale.pageAlignVertically = true;
 
         this.game.scale.enterFullScreen.add(this._onEnterFullScreen, this);
         this.game.scale.leaveFullScreen.add(this._onLeaveFullScreen, this);
@@ -22,14 +24,21 @@ MainMenu.prototype = {
 
         this.game.add.button(x, y, 'new-game', this.onStartClick, this);
         y += 70;
-        this.game.add.button(x, y, 'tutorial', this.onStartClick, this);
+        this.game.add.button(x, y, 'tutorial', this.onTutorialClick, this);
         y += 70;
         this.game.add.button(x, y, 'fullscreen', this.onFullscreen, this);
 
+    },
+
+    _displayLastScore: function () {
+        var score;
+
         if (Storage.isSupported && Storage.get('defend.score')) {
 
+            score = Storage.get('defend.score');
+
             this.scoreText = this.game.add.text(
-                this.game.width - 250, 130, 'Last score:\n' + Storage.get('defend.score') || 0, {
+                this.game.width - 250, 130, 'Last score:\n' + score || 0, {
                 font: '24px Creepster',
                 fill: '#ffffff',
                 align: 'center',
@@ -52,14 +61,25 @@ MainMenu.prototype = {
     onFullscreen: function () {
 
         this.game.scale.startFullScreen();
-        this.game.stage.scale.pageAlignHorizontally = true;
-        this.game.stage.scale.pageAlignVertically = true;
     },
 
     onStartClick: function () {
 
         console.log('Start game');
-        this.game.state.start('Game');
+        var state = 'Game';
+
+        if (Storage.isSupported() &&
+            Storage.get('defend.showIntro') !== 'false') {
+
+            state = 'Story';
+        }
+
+        this.game.state.start(state);
+    },
+
+    onTutorialClick: function () {
+
+        this.game.state.start('Story');
     }
 };
 

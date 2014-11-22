@@ -14,6 +14,12 @@ Boot.prototype = {
     },
 
     create: function() {
+
+        // TODO: font hack to load it from Google
+        this.storyText = this.game.add.text(60, 100, 'AAA', {
+            font: '18px Creepster',
+        });
+
         this.game.input.maxPointers = 1;
 
         // this.game.stage.scaleMode = Phaser.StageScaleMode.SHOW_ALL;

@@ -68,7 +68,6 @@ Game.prototype = {
         // Add light
         this.light = this.game.add.sprite(100, 200, 'light');
         this.light.anchor = new Phaser.Point(0.5, 0.5);
-        // this.light.scale(0.4);
 
         this.light.fixedToCamera = true;
         this.game.physics.enable(this.light, Phaser.Physics.ARCADE);
@@ -334,7 +333,6 @@ Game.prototype = {
     _collisionHandler: function (bullet, enemy) {
         var score = 10;
 
-        console.log('Collison', enemy.health);
         enemy.damage(this.rnd.integerInRange(5, 15));
 
         if (enemy.health <= 0) {

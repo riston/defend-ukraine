@@ -51,6 +51,7 @@
 	var Preloader = __webpack_require__(2);
 	var MainMenu = __webpack_require__(3);
 	var Game = __webpack_require__(4);
+	var Story = __webpack_require__(11);
 
 	var game = new Phaser.Game(800, 600, Phaser.AUTO, 'game');
 
@@ -58,6 +59,7 @@
 	game.state.add('Boot', Boot);
 	game.state.add('MainMenu', MainMenu);
 	game.state.add('Game', Game);
+	game.state.add('Story', Story);
 
 	game.state.start('Boot');
 
@@ -82,6 +84,12 @@
 	    },
 
 	    create: function() {
+
+	        // TODO: font hack to load it from Google
+	        this.storyText = this.game.add.text(60, 100, 'AAA', {
+	            font: '18px Creepster',
+	        });
+
 	        this.game.input.maxPointers = 1;
 
 	        // this.game.stage.scaleMode = Phaser.StageScaleMode.SHOW_ALL;
@@ -132,17 +140,19 @@
 	        this.load.image('main-theme',   imgP + 'main_theme.jpg');
 
 	        // Button
+	        this.load.image('play', imgP + 'button/play.png');
+
 	        this.load.image('new-game', imgP + 'button/new_game.png');
-	//        this.load.image('new-game-hover', 'img/button/new_game_hover.png');
-	//        this.load.image('new-game-click', 'img/button/new_game_click.png');
+	        this.load.image('new-game-hover', imgP + 'button/new_game_hover.png');
+	        this.load.image('new-game-click', imgP + 'button/new_game_click.png');
 
 	        this.load.image('tutorial', imgP + 'button/tutorial.png');
-	//        this.load.image('tutorial-hover', 'img/button/tutorial_hover.png');
-	//        this.load.image('tutorial-click', 'img/button/tutorial_click.png');
+	        this.load.image('tutorial-hover', imgP + 'button/tutorial_hover.png');
+	        this.load.image('tutorial-click', imgP + 'button/tutorial_click.png');
 
 	        this.load.image('fullscreen', imgP + 'button/fullscreen.png');
-	//        this.load.image('fullscreen-hover', 'img/button/fullscreen_hover.png');
-	//        this.load.image('fullscreen-click', 'img/button/fullscreen_click.png');
+	        this.load.image('fullscreen-hover', imgP + 'button/fullscreen_hover.png');
+	        this.load.image('fullscreen-click', imgP + 'button/fullscreen_click.png');
 
 
 	//        this.load.image('tutorial', 'img/button/tutorial.png');
@@ -181,6 +191,8 @@
 	        var y = 260;
 
 	        this.game.scale.fullScreenScaleMode = Phaser.ScaleManager.SHOW_ALL;
+	        this.game.stage.scale.pageAlignHorizontally = true;
+	        this.game.stage.scale.pageAlignVertically = true;
 
 	        this.game.scale.enterFullScreen.add(this._onEnterFullScreen, this);
 	        this.game.scale.leaveFullScreen.add(this._onLeaveFullScreen, this);
@@ -191,14 +203,21 @@
 
 	        this.game.add.button(x, y, 'new-game', this.onStartClick, this);
 	        y += 70;
-	        this.game.add.button(x, y, 'tutorial', this.onStartClick, this);
+	        this.game.add.button(x, y, 'tutorial', this.onTutorialClick, this);
 	        y += 70;
 	        this.game.add.button(x, y, 'fullscreen', this.onFullscreen, this);
 
+	    },
+
+	    _displayLastScore: function () {
+	        var score;
+
 	        if (Storage.isSupported && Storage.get('defend.score')) {
 
+	            score = Storage.get('defend.score');
+
 	            this.scoreText = this.game.add.text(
-	                this.game.width - 250, 130, 'Last score:\n' + Storage.get('defend.score') || 0, {
+	                this.game.width - 250, 130, 'Last score:\n' + score || 0, {
 	                font: '24px Creepster',
 	                fill: '#ffffff',
 	                align: 'center',
@@ -221,14 +240,25 @@
 	    onFullscreen: function () {
 
 	        this.game.scale.startFullScreen();
-	        this.game.stage.scale.pageAlignHorizontally = true;
-	        this.game.stage.scale.pageAlignVertically = true;
 	    },
 
 	    onStartClick: function () {
 
 	        console.log('Start game');
-	        this.game.state.start('Game');
+	        var state = 'Game';
+
+	        if (Storage.isSupported() &&
+	            Storage.get('defend.showIntro') !== 'false') {
+
+	            state = 'Story';
+	        }
+
+	        this.game.state.start(state);
+	    },
+
+	    onTutorialClick: function () {
+
+	        this.game.state.start('Story');
 	    }
 	};
 
@@ -309,7 +339,6 @@
 	        // Add light
 	        this.light = this.game.add.sprite(100, 200, 'light');
 	        this.light.anchor = new Phaser.Point(0.5, 0.5);
-	        // this.light.scale(0.4);
 
 	        this.light.fixedToCamera = true;
 	        this.game.physics.enable(this.light, Phaser.Physics.ARCADE);
@@ -575,7 +604,6 @@
 	    _collisionHandler: function (bullet, enemy) {
 	        var score = 10;
 
-	        console.log('Collison', enemy.health);
 	        enemy.damage(this.rnd.integerInRange(5, 15));
 
 	        if (enemy.health <= 0) {
@@ -885,6 +913,101 @@
 	};
 
 	module.exports = BatteryGroup;
+
+
+/***/ },
+/* 11 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Storage = __webpack_require__(5);
+
+	var Story = function(game) {
+	    this.TEXT_SPEED = 70;
+	};
+
+	Story.prototype = {
+
+	    preload: function() {
+
+	    },
+
+	    create: function() {
+
+	        this.text = [
+	            'Group of Ukraine soldiers were heading back to base,',
+	            'while their group were crossed with separatists near Donetsk.',
+	            'After heavy battle, you were the only survivor. ',
+	            '',
+	            'Separatists backup has just arrived, ',
+	            'so you have to hold the line and keep your flashlight alive.',
+	        ];
+
+	        this.written = '';
+
+	        // Add background
+	        this.background = this.game.add.sprite(this.game.world.centerX, this.game.world.centerY, 'background');
+	        this.background.anchor.set(0.5, 0.5);
+
+	        this.titleText = this.game.add.text(60, 60, 'Defend-ukraine', {
+	            font: '34px Creepster',
+	            fill: '#ffffff',
+	        });
+
+	        this.storyText = this.game.add.text(60, 100, 'Defend-ukraine', {
+	            font: '22px Creepster',
+	            fill: '#ffffff',
+	        });
+
+	        this.game.add.button(this.game.width - 300, this.game.height - 100, 'play', this.onStartClick, this);
+
+	        this.line  = 0;
+	        this.pos   = 0;
+	        this.delta = this.game.time.now;
+
+	        this.textEnd = false;
+	    },
+
+	    update: function () {
+
+	        if ((this.game.time.now - this.delta) > this.TEXT_SPEED
+	            && !this.textEnd) {
+
+	            if (this.text.length <= this.line) {
+
+	                this.textEnd = true;
+	            }
+	            else {
+
+	                this.written += this.text[this.line].charAt(this.pos++);
+	                this.storyText.setText(this.written);
+
+	                if (this.text[this.line].length <= this.pos) {
+
+	                    // Reached line end
+	                    this.line++;
+	                    this.pos = 0;
+	                    this.written += '\n';
+	                }
+
+	                this.delta = this.game.time.now;
+	            }
+
+	        }
+	    },
+
+	    onStartClick: function () {
+
+	        if (Storage.isSupported()) {
+
+	            Storage.set('defend.showIntro', false);
+	        }
+
+	        console.log('Start game');
+	        this.game.state.start('Game');
+	    }
+	};
+
+	module.exports = Story;
 
 
 /***/ }
