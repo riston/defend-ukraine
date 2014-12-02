@@ -15,6 +15,7 @@ Preloader.prototype = {
         this.preloadBar = this.add.sprite(cX - (158 / 2), cY - (50 / 2) + 200, 'preloaderBar');
 
         this.load.setPreloadSprite(this.preloadBar);
+        this.load.spritesheet('explosion', imgP + 'explosion.png', 64, 64, 16);
         this.load.image('bullet',       imgP + 'shot.png');
         this.load.image('bullet-shell', imgP + 'bullet.png');
         this.load.image('soldier',      imgP + 'soldier.png');

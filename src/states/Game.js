@@ -6,6 +6,7 @@ var SoldierGroup = require('../groups/SoldierGroup');
 var TruckGroup = require('../groups/TruckGroup');
 var TankGroup = require('../groups/TankGroup');
 var BatteryGroup = require('../groups/BatteryGroup');
+var ExplosionGroup = require('../groups/ExplosionGroup');
 
 var Game = function(game) {
 
@@ -50,6 +51,9 @@ Game.prototype = {
 
         // Battery
         this.batteries = new BatteryGroup(this.game);
+
+        // Explosion
+        this.explosion = new ExplosionGroup(this.game);
 
         // Bullets pool
         this.bullets = this.add.group();
@@ -171,6 +175,9 @@ Game.prototype = {
             this.game.state.start('MainMenu');
         }
 
+        // Check tank outside
+        this.tanks.checkWorld();
+
         this.updateScore();
         this.updateFPS();
 
@@ -278,6 +285,11 @@ Game.prototype = {
     },
 
     render: function () {
+        // this.tanks.forEachAlive(this._renderGroup, this);
+    },
+
+    _renderGroup: function (tank) {
+        this.game.debug.body(tank);
     },
 
     _fireGun: function (x, y) {
@@ -332,6 +344,7 @@ Game.prototype = {
 
     _collisionHandler: function (bullet, enemy) {
         var score = 10;
+        var x, y;
 
         enemy.damage(this.rnd.integerInRange(5, 15));
 
@@ -341,12 +354,21 @@ Game.prototype = {
             this.game.sound.play('dead');
             this._setText('+' + score + ' points');
 
-            if ((enemy.key === "tank" || enemy.key === "truck")
-                && this.game.math.chanceRoll(20)) {
+            console.log('Kill');
 
-                this.batteries.spawn(
-                    enemy.x + enemy.width / 2,
-                    enemy.y + enemy.height / 2);
+            if (enemy.key === "tank" ||
+                enemy.key === "truck") {
+
+                x = enemy.x + enemy.width / 2;
+                y = enemy.y + enemy.height / 2;
+
+                // Add explode animation
+                this.explosion.spawnTo(x, y);
+
+                if (this.game.math.chanceRoll(20)) {
+
+                    this.batteries.spawn(x, y);
+                }
             }
 
             enemy.kill();
@@ -368,7 +390,7 @@ Game.prototype = {
         angle.onComplete.add(function () {
 
             var scale = this.game.add.tween(battery.scale);
-            scale.to({ x: 3, y: 3});
+            scale.to({ x: 3, y: 3 });
 
             var alpha = this.game.add.tween(battery);
             alpha.to({ alpha: 0});

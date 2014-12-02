@@ -12,6 +12,9 @@ MainMenu.prototype = {
         var y = 260;
 
         this.game.scale.fullScreenScaleMode = Phaser.ScaleManager.SHOW_ALL;
+        this.game.scale.maxWidth = 2880;
+        this.game.scale.maxHeight = 1920;
+
         this.game.stage.scale.pageAlignHorizontally = true;
         this.game.stage.scale.pageAlignVertically = true;
 

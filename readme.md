@@ -16,6 +16,10 @@ To run the webpack server:
 
 ```webpack-dev-server --progress --colors src```
 
+## Images
+
+[Explosion](http://opengameart.org/content/explosion)
+
 ## License
 
 MIT

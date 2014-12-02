@@ -51,7 +51,7 @@
 	var Preloader = __webpack_require__(2);
 	var MainMenu = __webpack_require__(3);
 	var Game = __webpack_require__(4);
-	var Story = __webpack_require__(11);
+	var Story = __webpack_require__(5);
 
 	var game = new Phaser.Game(800, 600, Phaser.AUTO, 'game');
 
@@ -124,6 +124,7 @@
 	        this.preloadBar = this.add.sprite(cX - (158 / 2), cY - (50 / 2) + 200, 'preloaderBar');
 
 	        this.load.setPreloadSprite(this.preloadBar);
+	        this.load.spritesheet('explosion', imgP + 'explosion.png', 64, 64, 16);
 	        this.load.image('bullet',       imgP + 'shot.png');
 	        this.load.image('bullet-shell', imgP + 'bullet.png');
 	        this.load.image('soldier',      imgP + 'soldier.png');
@@ -180,7 +181,7 @@
 	/**
 	 * Created by risto on 19.10.14.
 	 */
-	var Storage = __webpack_require__(5);
+	var Storage = __webpack_require__(6);
 
 	var MainMenu = function(game) {};
 
@@ -191,6 +192,9 @@
 	        var y = 260;
 
 	        this.game.scale.fullScreenScaleMode = Phaser.ScaleManager.SHOW_ALL;
+	        this.game.scale.maxWidth = 2880;
+	        this.game.scale.maxHeight = 1920;
+
 	        this.game.stage.scale.pageAlignHorizontally = true;
 	        this.game.stage.scale.pageAlignVertically = true;
 
@@ -272,11 +276,12 @@
 	/**
 	 * Created by risto on 25.10.14.
 	 */
-	var Storage = __webpack_require__(5);
-	var SoldierGroup = __webpack_require__(6);
-	var TruckGroup = __webpack_require__(7);
-	var TankGroup = __webpack_require__(8);
+	var Storage = __webpack_require__(6);
+	var SoldierGroup = __webpack_require__(7);
+	var TruckGroup = __webpack_require__(8);
+	var TankGroup = __webpack_require__(9);
 	var BatteryGroup = __webpack_require__(10);
+	var ExplosionGroup = __webpack_require__(11);
 
 	var Game = function(game) {
 
@@ -321,6 +326,9 @@
 
 	        // Battery
 	        this.batteries = new BatteryGroup(this.game);
+
+	        // Explosion
+	        this.explosion = new ExplosionGroup(this.game);
 
 	        // Bullets pool
 	        this.bullets = this.add.group();
@@ -442,6 +450,9 @@
 	            this.game.state.start('MainMenu');
 	        }
 
+	        // Check tank outside
+	        this.tanks.checkWorld();
+
 	        this.updateScore();
 	        this.updateFPS();
 
@@ -549,6 +560,11 @@
 	    },
 
 	    render: function () {
+	        // this.tanks.forEachAlive(this._renderGroup, this);
+	    },
+
+	    _renderGroup: function (tank) {
+	        this.game.debug.body(tank);
 	    },
 
 	    _fireGun: function (x, y) {
@@ -603,6 +619,7 @@
 
 	    _collisionHandler: function (bullet, enemy) {
 	        var score = 10;
+	        var x, y;
 
 	        enemy.damage(this.rnd.integerInRange(5, 15));
 
@@ -612,12 +629,21 @@
 	            this.game.sound.play('dead');
 	            this._setText('+' + score + ' points');
 
-	            if ((enemy.key === "tank" || enemy.key === "truck")
-	                && this.game.math.chanceRoll(20)) {
+	            console.log('Kill');
 
-	                this.batteries.spawn(
-	                    enemy.x + enemy.width / 2,
-	                    enemy.y + enemy.height / 2);
+	            if (enemy.key === "tank" ||
+	                enemy.key === "truck") {
+
+	                x = enemy.x + enemy.width / 2;
+	                y = enemy.y + enemy.height / 2;
+
+	                // Add explode animation
+	                this.explosion.spawnTo(x, y);
+
+	                if (this.game.math.chanceRoll(20)) {
+
+	                    this.batteries.spawn(x, y);
+	                }
 	            }
 
 	            enemy.kill();
@@ -639,7 +665,7 @@
 	        angle.onComplete.add(function () {
 
 	            var scale = this.game.add.tween(battery.scale);
-	            scale.to({ x: 3, y: 3});
+	            scale.to({ x: 3, y: 3 });
 
 	            var alpha = this.game.add.tween(battery);
 	            alpha.to({ alpha: 0});
@@ -690,236 +716,7 @@
 /* 5 */
 /***/ function(module, exports, __webpack_require__) {
 
-	
-	var Storage = {
-
-	    isSupported: function () {
-
-	        try {
-	            return 'localStorage' in window &&
-	                window.localStorage !== null;
-	        } catch (e) {
-
-	            return false;
-	        }
-	    },
-
-	    get: function (key) {
-
-	        return localStorage.getItem(key);
-	    },
-
-	    set: function (key, value) {
-
-	        return localStorage.setItem(key, value);
-	    }
-
-	};
-
-	module.exports = Storage;
-
-
-/***/ },
-/* 6 */
-/***/ function(module, exports, __webpack_require__) {
-
-	
-	var EnemyGroup = __webpack_require__(9);
-
-	var SoldierGroup = function (game) {
-	    this.AMMOUNT = 5;
-
-	    EnemyGroup.call(this, game);
-
-	    this.key = 'soldier';
-	    this.setAll('enableBody', true);
-	    this.createMultiple(this.AMMOUNT, 'soldier');
-	};
-
-	SoldierGroup.prototype = Object.create(EnemyGroup.prototype);
-	SoldierGroup.prototype.construct = SoldierGroup;
-
-	module.exports = SoldierGroup;
-
-
-/***/ },
-/* 7 */
-/***/ function(module, exports, __webpack_require__) {
-
-	
-	var EnemyGroup = __webpack_require__(9);
-
-	var TruckGroup = function (game) {
-	    this.AMMOUNT = 1;
-
-	    EnemyGroup.call(this, game);
-
-	    this.key = 'truck';
-	    this.setAll('enableBody', true);
-	    this.createMultiple(this.AMMOUNT, 'truck');
-	};
-
-	TruckGroup.prototype = Object.create(EnemyGroup.prototype);
-	TruckGroup.prototype.construct = TruckGroup;
-
-	module.exports = TruckGroup;
-
-
-/***/ },
-/* 8 */
-/***/ function(module, exports, __webpack_require__) {
-
-	
-	var EnemyGroup = __webpack_require__(9);
-
-	var TankGroup = function (game) {
-	    this.AMMOUNT = 2;
-
-	    EnemyGroup.call(this, game);
-
-	    this.key = 'tank';
-	    this.setAll('enableBody', true);
-	    this.setAll('outOfBoundsKill', true);
-
-	    this.createMultiple(this.AMMOUNT, 'tank');
-	};
-
-	TankGroup.prototype = Object.create(EnemyGroup.prototype);
-	TankGroup.prototype.construct = TankGroup;
-
-	TankGroup.prototype.moveStep = function () {
-
-	    this.forEachDead(this._addSpriteMove, this);
-	};
-
-	TankGroup.prototype._addSpriteMove = function (enemy) {
-
-	    var vanHalen = function (v) {
-
-	        return Math.sin(v * Math.PI) * 1;
-	    };
-
-	    var dir  = this.game.math.chanceRoll();
-	    var sx, sy, ex, ey;
-
-	    enemy.move = this.game.add.tween(enemy);
-	    enemy.jump = this.game.add.tween(enemy);
-
-	    if (dir) {
-	        sx = 0;
-	        sy = this.game.rnd.integerInRange(50, this.game.height - 75);
-	        ex = this.game.width;
-	        enemy.scale.x *= -1;
-	    }
-	    else {
-	        sx = this.game.width;
-	        sy = this.game.rnd.integerInRange(50, this.game.height - 75);
-	        ex = 0;
-	    }
-
-	    enemy.x = sx;
-	    enemy.move.to({ x: ex }, 15 * 1000);
-
-	    enemy.jump.to({ y: sy }, 15 * 1000, vanHalen, true, 0, Number.MAX_VALUE, 0);
-	    enemy.move.start();
-	};
-
-	module.exports = TankGroup;
-
-
-/***/ },
-/* 9 */
-/***/ function(module, exports, __webpack_require__) {
-
-	
-	var EnemyGroup = function (game, key) {
-
-	    Phaser.Group.call(this, game);
-
-	    this.key = key;
-	    this.ENEMY_HEALTH = 100;
-	    this.REWARD = 10;
-	    this.health = 0;
-
-	    this.setAll('anchor.x', 0.5);
-	    this.setAll('anchor.y', 0.5);
-	};
-
-	EnemyGroup.prototype = Object.create(Phaser.Group.prototype);
-	EnemyGroup.prototype.construct = EnemyGroup;
-
-	EnemyGroup.prototype.spawn = function (enemy) {
-
-	    enemy.alpha = 0;
-	    enemy.enableBody = true;
-
-	    enemy.reset(
-	        this.game.rnd.integerInRange(0, this.game.width - 64),
-	        this.game.rnd.integerInRange(0, this.game.height - 64)
-	    );
-
-	    this.game.add.tween(enemy)
-	        .to({ alpha: 1 }, Phaser.Easing.Linear.Out)
-	        .start();
-
-	    enemy.health = this.ENEMY_HEALTH;
-	    this.game.physics.enable(enemy, Phaser.Physics.ARCADE);
-
-	};
-
-	EnemyGroup.prototype.spawnAll = function () {
-
-	    this.forEachDead(this._spawn, this);
-	};
-
-	module.exports = EnemyGroup;
-
-
-/***/ },
-/* 10 */
-/***/ function(module, exports, __webpack_require__) {
-
-	
-	var BatteryGroup = function (game, key) {
-
-	    Phaser.Group.call(this, game);
-
-	    this.AMMOUNT = 10;
-	    this.key = 'battery';
-	    this.createMultiple(this.AMMOUNT, 'battery');
-	};
-
-	BatteryGroup.prototype = Object.create(Phaser.Group.prototype);
-	BatteryGroup.prototype.construct = BatteryGroup;
-
-	BatteryGroup.prototype.spawn = function (x, y) {
-
-	    var battery = this.getFirstDead();
-
-	    if (!battery) {
-	        return;
-	    }
-
-	    battery.reset(x, y);
-
-	    battery.anchor.set(0.5, 0.5);
-	    this.game.physics.enable(battery, Phaser.Physics.ARCADE);
-	};
-
-
-	BatteryGroup.prototype.spawnAll = function () {
-
-	    this.forEachDead(this._spawn, this);
-	};
-
-	module.exports = BatteryGroup;
-
-
-/***/ },
-/* 11 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var Storage = __webpack_require__(5);
+	var Storage = __webpack_require__(6);
 
 	var Story = function(game) {
 	    this.TEXT_SPEED = 70;
@@ -1008,6 +805,294 @@
 	};
 
 	module.exports = Story;
+
+
+/***/ },
+/* 6 */
+/***/ function(module, exports, __webpack_require__) {
+
+	
+	var Storage = {
+
+	    isSupported: function () {
+
+	        try {
+	            return 'localStorage' in window &&
+	                window.localStorage !== null;
+	        } catch (e) {
+
+	            return false;
+	        }
+	    },
+
+	    get: function (key) {
+
+	        return localStorage.getItem(key);
+	    },
+
+	    set: function (key, value) {
+
+	        return localStorage.setItem(key, value);
+	    }
+
+	};
+
+	module.exports = Storage;
+
+
+/***/ },
+/* 7 */
+/***/ function(module, exports, __webpack_require__) {
+
+	
+	var EnemyGroup = __webpack_require__(12);
+
+	var SoldierGroup = function (game) {
+	    this.AMMOUNT = 5;
+
+	    EnemyGroup.call(this, game);
+
+	    this.key = 'soldier';
+	    this.setAll('enableBody', true);
+	    this.createMultiple(this.AMMOUNT, 'soldier');
+	};
+
+	SoldierGroup.prototype = Object.create(EnemyGroup.prototype);
+	SoldierGroup.prototype.construct = SoldierGroup;
+
+	module.exports = SoldierGroup;
+
+
+/***/ },
+/* 8 */
+/***/ function(module, exports, __webpack_require__) {
+
+	
+	var EnemyGroup = __webpack_require__(12);
+
+	var TruckGroup = function (game) {
+	    this.AMMOUNT = 1;
+
+	    EnemyGroup.call(this, game);
+
+	    this.key = 'truck';
+	    this.setAll('enableBody', true);
+	    this.createMultiple(this.AMMOUNT, 'truck');
+	};
+
+	TruckGroup.prototype = Object.create(EnemyGroup.prototype);
+	TruckGroup.prototype.construct = TruckGroup;
+
+	module.exports = TruckGroup;
+
+
+/***/ },
+/* 9 */
+/***/ function(module, exports, __webpack_require__) {
+
+	
+	var EnemyGroup = __webpack_require__(12);
+
+	var TankGroup = function (game) {
+	    this.AMMOUNT = 2;
+
+	    EnemyGroup.call(this, game);
+
+	    this.key = 'tank';
+	    this.createMultiple(this.AMMOUNT, 'tank');
+	    this.setAll('enableBody', true);
+	    this.setAll('outOfBoundsKill', true);
+	    this.setAll('physicsBodyType', Phaser.Physics.ARCADE);
+	};
+
+	TankGroup.prototype = Object.create(EnemyGroup.prototype);
+	TankGroup.prototype.construct = TankGroup;
+
+	TankGroup.prototype.moveStep = function () {
+
+	    this.forEachDead(this._addSpriteMove, this);
+	};
+
+	/**
+	 * Manual check for borders.
+	 */
+	TankGroup.prototype.checkWorld = function () {
+
+	    this.forEach(function (tank) {
+
+	        if (tank.x <= 0 || tank.x >= this.game.width) {
+	            tank.kill();
+	        }
+	    }, this);
+	};
+
+	TankGroup.prototype._addSpriteMove = function (enemy) {
+
+	    var vanHalen = function (v) {
+
+	        return Math.sin(v * Math.PI) * 1;
+	    };
+
+	    var dir  = this.game.math.chanceRoll();
+	    var margin = 75;
+	    var sx, sy, ex, ey;
+
+	    enemy.move = this.game.add.tween(enemy);
+	    enemy.jump = this.game.add.tween(enemy);
+	    enemy.anchor.x = 0.5;
+	    enemy.anchor.y = 0.5;
+
+	    if (dir) {
+	        sx = -margin;
+	        sy = this.game.rnd.integerInRange(50, this.game.height - 75);
+	        ex = this.game.width + margin;
+	        enemy.scale.x *= -1;
+	    }
+	    else {
+	        sx = this.game.width + margin;
+	        sy = this.game.rnd.integerInRange(50, this.game.height - 75);
+	        ex = -margin;
+	    }
+
+	    enemy.move.to({ x: ex }, 15 * 1000);
+
+	    enemy.jump.to({ y: sy }, 15 * 1000, vanHalen, true, 0, Number.MAX_VALUE, 0);
+	    enemy.move.start();
+	};
+
+	module.exports = TankGroup;
+
+
+/***/ },
+/* 10 */
+/***/ function(module, exports, __webpack_require__) {
+
+	
+	var BatteryGroup = function (game, key) {
+
+	    Phaser.Group.call(this, game);
+
+	    this.AMMOUNT = 10;
+	    this.key = 'battery';
+	    this.createMultiple(this.AMMOUNT, 'battery');
+	};
+
+	BatteryGroup.prototype = Object.create(Phaser.Group.prototype);
+	BatteryGroup.prototype.construct = BatteryGroup;
+
+	BatteryGroup.prototype.spawn = function (x, y) {
+
+	    var battery = this.getFirstDead();
+
+	    if (!battery) {
+	        return;
+	    }
+
+	    battery.reset(x, y);
+
+	    battery.anchor.set(0.5, 0.5);
+	    this.game.physics.enable(battery, Phaser.Physics.ARCADE);
+	};
+
+
+	BatteryGroup.prototype.spawnAll = function () {
+
+	    this.forEachDead(this._spawn, this);
+	};
+
+	module.exports = BatteryGroup;
+
+
+/***/ },
+/* 11 */
+/***/ function(module, exports, __webpack_require__) {
+
+	
+	var ExplosionGroup = function (game) {
+
+	    Phaser.Group.call(this, game);
+
+	    this.AMMOUNT = 3;
+	    this.key = 'explosion';
+
+
+	    this.createMultiple(this.AMMOUNT, 'explosion');
+	};
+
+	ExplosionGroup.prototype = Object.create(Phaser.Group.prototype);
+	ExplosionGroup.prototype.construct = ExplosionGroup;
+
+	ExplosionGroup.prototype.spawnTo = function (x, y) {
+
+	    var explosion = this.getFirstDead();
+
+	    if (!explosion) {
+	        return;
+	    }
+
+	    explosion.reset(x, y);
+
+	    explosion.anchor.set(0.5, 0.5);
+
+	    // Playing an animation ( 'key', frameRate, loop )
+	    explosion.loadTexture('explosion', 0);
+	    // Adding an animation ( 'key' )
+	    explosion.animations.add('explode');
+	    // To play the animation with the new texture ( 'key', frameRate, loop, killOnComplete)
+	    explosion.animations.play('explode', 7, false, true);
+	};
+
+	module.exports = ExplosionGroup;
+
+
+/***/ },
+/* 12 */
+/***/ function(module, exports, __webpack_require__) {
+
+	
+	var EnemyGroup = function (game, key) {
+
+	    Phaser.Group.call(this, game);
+
+	    this.key = key;
+	    this.ENEMY_HEALTH = 100;
+	    this.REWARD = 10;
+	    this.health = 0;
+
+	    this.setAll('anchor.x', 0.5);
+	    this.setAll('anchor.y', 0.5);
+	};
+
+	EnemyGroup.prototype = Object.create(Phaser.Group.prototype);
+	EnemyGroup.prototype.construct = EnemyGroup;
+
+	EnemyGroup.prototype.spawn = function (enemy) {
+
+	    enemy.alpha = 0;
+	    enemy.enableBody = true;
+	    enemy.body.collideWorldBounds = false;
+
+	    enemy.reset(
+	        this.game.rnd.integerInRange(0, this.game.width - 64),
+	        this.game.rnd.integerInRange(0, this.game.height - 64)
+	    );
+
+	    enemy.checkWorldBounds = true;
+	    enemy.outOfBoundsKill = true;
+
+	    this.game.add.tween(enemy)
+	        .to({ alpha: 1 }, Phaser.Easing.Linear.Out)
+	        .start();
+
+	    enemy.health = this.ENEMY_HEALTH;
+	};
+
+	EnemyGroup.prototype.spawnAll = function () {
+
+	    this.forEachDead(this._spawn, this);
+	};
+
+	module.exports = EnemyGroup;
 
 
 /***/ }
