@@ -11,6 +11,7 @@ Story.prototype = {
     },
 
     create: function() {
+        var x, y;
 
         this.text = [
             'Group of Ukraine soldiers were heading back to base,',
@@ -32,10 +33,38 @@ Story.prototype = {
             fill: '#ffffff',
         });
 
-        this.storyText = this.game.add.text(60, 100, 'Defend-ukraine', {
+        this.storyText = this.game.add.text(60, 100, 'Story should be located here', {
             font: '22px Creepster',
             fill: '#ffffff',
         });
+
+        x = 60; y = 300;
+        this.terroristText = this.game.add.text(x, y, 'Shoot terrorists', {
+            font: '16px Creepster',
+            fill: '#ffffff',
+        });
+        this.game.add.sprite(x + 25, y + 70, 'soldier');
+
+        x += 160;
+        this.truckText = this.game.add.text(x, y, 'Trucks and tanks\n contain batteries', {
+            font: '16px Creepster',
+            fill: '#ffffff',
+        });
+        this.game.add.sprite(x + 25, y + 70, 'truck');
+        this.game.add.sprite(x + 30, y + 120, 'tank');
+
+        x += 160;
+        this.batteryText = this.game.add.text(x, y, 'Collect batteries to\nkeep your flashlight\nworking', {
+            font: '16px Creepster',
+            fill: '#ffffff',
+        });
+        this.game.add.sprite(x + 30, y + 70, 'battery');
+
+        x += 200;
+        this.game.add.sprite(x + 50, y + 0, 'tree1');
+        this.game.add.sprite(x + 30, y + 20, 'tree');
+        this.game.add.sprite(x - 30, y + 50, 'evergreen');
+        this.game.add.sprite(x + 100, y + 30, 'evergreen');
 
         this.game.add.button(this.game.width - 300, this.game.height - 100, 'play', this.onStartClick, this);
 

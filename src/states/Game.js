@@ -1,11 +1,11 @@
 /**
  * Created by risto on 25.10.14.
  */
-var Storage = require('../Storage');
-var SoldierGroup = require('../groups/SoldierGroup');
-var TruckGroup = require('../groups/TruckGroup');
-var TankGroup = require('../groups/TankGroup');
-var BatteryGroup = require('../groups/BatteryGroup');
+var Storage        = require('../Storage');
+var SoldierGroup   = require('../groups/SoldierGroup');
+var TruckGroup     = require('../groups/TruckGroup');
+var TankGroup      = require('../groups/TankGroup');
+var BatteryGroup   = require('../groups/BatteryGroup');
 var ExplosionGroup = require('../groups/ExplosionGroup');
 
 var Game = function(game) {
