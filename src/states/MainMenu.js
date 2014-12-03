@@ -25,6 +25,9 @@ MainMenu.prototype = {
         this.background = this.game.add.sprite(this.game.world.centerX, this.game.world.centerY, 'main-theme');
         this.background.anchor.set(0.5, 0.47);
 
+        // Show the last score
+        this._displayLastScore();
+
         this.game.add.button(x, y, 'new-game', this.onStartClick, this);
         y += 70;
         this.game.add.button(x, y, 'tutorial', this.onTutorialClick, this);

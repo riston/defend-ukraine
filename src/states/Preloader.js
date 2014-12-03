@@ -2,9 +2,10 @@
  * Created by risto on 19.10.14.
  */
 
-var Preloader = function (game) {}
+var Preloader = function (game) { }
 
 Preloader.prototype = {
+
     preload: function() {
         var imgP = './img/';
         var cX = this.game.world.centerX;

@@ -1,0 +1,10 @@
+body {
+    margin: 0;
+    background-color: #000000;
+    cursor: crosshair;
+}
+
+#game {
+    display: table;
+    margin: 0 auto;
+}

@@ -111,9 +111,10 @@
 	 * Created by risto on 19.10.14.
 	 */
 
-	var Preloader = function (game) {}
+	var Preloader = function (game) { }
 
 	Preloader.prototype = {
+
 	    preload: function() {
 	        var imgP = './img/';
 	        var cX = this.game.world.centerX;
@@ -204,6 +205,9 @@
 	        // Add background
 	        this.background = this.game.add.sprite(this.game.world.centerX, this.game.world.centerY, 'main-theme');
 	        this.background.anchor.set(0.5, 0.47);
+
+	        // Show the last score
+	        this._displayLastScore();
 
 	        this.game.add.button(x, y, 'new-game', this.onStartClick, this);
 	        y += 70;
@@ -729,15 +733,18 @@
 	    },
 
 	    create: function() {
+
+	        var textConfig = {};
 	        var x, y;
 
 	        this.text = [
-	            'Group of Ukraine soldiers were heading back to base,',
-	            'while their group were crossed with separatists near Donetsk.',
-	            'After heavy battle, you were the only survivor. ',
+	            'Group of Ukraine soldiers were heading back to military base,',
+	            'while their road were crossed with separatists near Donetsk.',
+	            'After heavy battle, you were the only survivor...',
 	            '',
 	            'Separatists backup has just arrived, ',
-	            'so you have to hold the line and keep your flashlight alive.',
+	            'so you have to hold the last line and keep your flashlight working !!!',
+	            'Good luck.',
 	        ];
 
 	        this.written = '';
@@ -756,26 +763,22 @@
 	            fill: '#ffffff',
 	        });
 
-	        x = 60; y = 300;
-	        this.terroristText = this.game.add.text(x, y, 'Shoot terrorists', {
-	            font: '16px Creepster',
+	        textConfig = {
+	            font: '18px Creepster',
 	            fill: '#ffffff',
-	        });
+	        };
+
+	        x = 60; y = 300;
+	        this.terroristText = this.game.add.text(x, y, 'Shoot separatists', textConfig);
 	        this.game.add.sprite(x + 25, y + 70, 'soldier');
 
 	        x += 160;
-	        this.truckText = this.game.add.text(x, y, 'Trucks and tanks\n contain batteries', {
-	            font: '16px Creepster',
-	            fill: '#ffffff',
-	        });
+	        this.truckText = this.game.add.text(x, y, 'Destroy trucks and tanks\n to get batteries', textConfig);
 	        this.game.add.sprite(x + 25, y + 70, 'truck');
 	        this.game.add.sprite(x + 30, y + 120, 'tank');
 
 	        x += 160;
-	        this.batteryText = this.game.add.text(x, y, 'Collect batteries to\nkeep your flashlight\nworking', {
-	            font: '16px Creepster',
-	            fill: '#ffffff',
-	        });
+	        this.batteryText = this.game.add.text(x, y, 'Collect batteries to\nkeep your flashlight\nworking', textConfig);
 	        this.game.add.sprite(x + 30, y + 70, 'battery');
 
 	        x += 200;
