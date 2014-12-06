@@ -164,7 +164,7 @@
 
 	        this.load.audio('shot', ['snd/shot.wav']);
 	        this.load.audio('dead', ['snd/dead.wav']);
-
+	        this.load.audio('over', ['snd/over.wav']);
 	    },
 	    create: function() {
 
@@ -183,6 +183,7 @@
 	 * Created by risto on 19.10.14.
 	 */
 	var Storage = __webpack_require__(6);
+	var InteractiveButton = __webpack_require__(13);
 
 	var MainMenu = function(game) {};
 
@@ -209,12 +210,13 @@
 	        // Show the last score
 	        this._displayLastScore();
 
-	        this.game.add.button(x, y, 'new-game', this.onStartClick, this);
-	        y += 70;
-	        this.game.add.button(x, y, 'tutorial', this.onTutorialClick, this);
-	        y += 70;
-	        this.game.add.button(x, y, 'fullscreen', this.onFullscreen, this);
+	        this.game.add.existing(new InteractiveButton(this.game, x, y, 'new-game', this._onStartClick, this));
 
+	        y += 70;
+	        this.game.add.existing(new InteractiveButton(this.game, x, y, 'tutorial', this._onTutorialClick, this));
+
+	        y += 70;
+	        this.game.add.existing(new InteractiveButton(this.game, x, y, 'fullscreen', this._onFullscreen, this));
 	    },
 
 	    _displayLastScore: function () {
@@ -245,12 +247,12 @@
 	        console.log('Leave full screen');
 	    },
 
-	    onFullscreen: function () {
+	    _onFullscreen: function () {
 
 	        this.game.scale.startFullScreen();
 	    },
 
-	    onStartClick: function () {
+	    _onStartClick: function () {
 
 	        console.log('Start game');
 	        var state = 'Game';
@@ -264,7 +266,7 @@
 	        this.game.state.start(state);
 	    },
 
-	    onTutorialClick: function () {
+	    _onTutorialClick: function () {
 
 	        this.game.state.start('Story');
 	    }
@@ -721,6 +723,7 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	var Storage = __webpack_require__(6);
+	var InteractiveButton = __webpack_require__(13);
 
 	var Story = function(game) {
 	    this.TEXT_SPEED = 70;
@@ -768,7 +771,7 @@
 	            fill: '#ffffff',
 	        };
 
-	        x = 60; y = 300;
+	        x = 60; y = 350;
 	        this.terroristText = this.game.add.text(x, y, 'Shoot separatists', textConfig);
 	        this.game.add.sprite(x + 25, y + 70, 'soldier');
 
@@ -777,7 +780,7 @@
 	        this.game.add.sprite(x + 25, y + 70, 'truck');
 	        this.game.add.sprite(x + 30, y + 120, 'tank');
 
-	        x += 160;
+	        x += 190;
 	        this.batteryText = this.game.add.text(x, y, 'Collect batteries to\nkeep your flashlight\nworking', textConfig);
 	        this.game.add.sprite(x + 30, y + 70, 'battery');
 
@@ -787,7 +790,13 @@
 	        this.game.add.sprite(x - 30, y + 50, 'evergreen');
 	        this.game.add.sprite(x + 100, y + 30, 'evergreen');
 
-	        this.game.add.button(this.game.width - 300, this.game.height - 100, 'play', this.onStartClick, this);
+	        this.game.add.existing(
+	            new InteractiveButton(
+	                this.game,
+	                this.game.width - 300,
+	                this.game.height - 100,
+	                'play',
+	                this.onStartClick, this));
 
 	        this.line  = 0;
 	        this.pos   = 0;
@@ -1125,6 +1134,38 @@
 	};
 
 	module.exports = EnemyGroup;
+
+
+/***/ },
+/* 13 */
+/***/ function(module, exports, __webpack_require__) {
+
+	
+	var InteractiveButton = function (game, x, y, sprite, callback, callbackContext) {
+
+	    Phaser.Button.call(this, game, x, y, sprite, callback, callbackContext);
+
+	    this.key = sprite;
+
+	    this.events.onInputOver.add(this._onInputOver, this);
+	    this.events.onInputOut.add(this._onInputOut, this);
+	};
+
+	InteractiveButton.prototype = Object.create(Phaser.Button.prototype);
+	InteractiveButton.prototype.construct = InteractiveButton;
+
+	InteractiveButton.prototype._onInputOver = function (button) {
+	    this.game.sound.play('over');
+	    button.blendMode = PIXI.blendModes.ADD;
+	};
+
+	InteractiveButton.prototype._onInputOut = function (button) {
+
+	    button.blendMode = PIXI.blendModes.NORMAL;
+	};
+
+
+	module.exports = InteractiveButton;
 
 
 /***/ }

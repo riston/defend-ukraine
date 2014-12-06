@@ -1,4 +1,5 @@
 var Storage = require('../Storage');
+var InteractiveButton = require('../InteractiveButton');
 
 var Story = function(game) {
     this.TEXT_SPEED = 70;
@@ -46,7 +47,7 @@ Story.prototype = {
             fill: '#ffffff',
         };
 
-        x = 60; y = 300;
+        x = 60; y = 350;
         this.terroristText = this.game.add.text(x, y, 'Shoot separatists', textConfig);
         this.game.add.sprite(x + 25, y + 70, 'soldier');
 
@@ -55,7 +56,7 @@ Story.prototype = {
         this.game.add.sprite(x + 25, y + 70, 'truck');
         this.game.add.sprite(x + 30, y + 120, 'tank');
 
-        x += 160;
+        x += 190;
         this.batteryText = this.game.add.text(x, y, 'Collect batteries to\nkeep your flashlight\nworking', textConfig);
         this.game.add.sprite(x + 30, y + 70, 'battery');
 
@@ -65,7 +66,13 @@ Story.prototype = {
         this.game.add.sprite(x - 30, y + 50, 'evergreen');
         this.game.add.sprite(x + 100, y + 30, 'evergreen');
 
-        this.game.add.button(this.game.width - 300, this.game.height - 100, 'play', this.onStartClick, this);
+        this.game.add.existing(
+            new InteractiveButton(
+                this.game,
+                this.game.width - 300,
+                this.game.height - 100,
+                'play',
+                this.onStartClick, this));
 
         this.line  = 0;
         this.pos   = 0;

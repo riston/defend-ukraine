@@ -55,7 +55,7 @@ Preloader.prototype = {
 
         this.load.audio('shot', ['snd/shot.wav']);
         this.load.audio('dead', ['snd/dead.wav']);
-
+        this.load.audio('over', ['snd/over.wav']);
     },
     create: function() {
 

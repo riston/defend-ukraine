@@ -2,6 +2,7 @@
  * Created by risto on 19.10.14.
  */
 var Storage = require('../Storage');
+var InteractiveButton = require('../InteractiveButton');
 
 var MainMenu = function(game) {};
 
@@ -28,12 +29,13 @@ MainMenu.prototype = {
         // Show the last score
         this._displayLastScore();
 
-        this.game.add.button(x, y, 'new-game', this.onStartClick, this);
-        y += 70;
-        this.game.add.button(x, y, 'tutorial', this.onTutorialClick, this);
-        y += 70;
-        this.game.add.button(x, y, 'fullscreen', this.onFullscreen, this);
+        this.game.add.existing(new InteractiveButton(this.game, x, y, 'new-game', this._onStartClick, this));
 
+        y += 70;
+        this.game.add.existing(new InteractiveButton(this.game, x, y, 'tutorial', this._onTutorialClick, this));
+
+        y += 70;
+        this.game.add.existing(new InteractiveButton(this.game, x, y, 'fullscreen', this._onFullscreen, this));
     },
 
     _displayLastScore: function () {
@@ -64,12 +66,12 @@ MainMenu.prototype = {
         console.log('Leave full screen');
     },
 
-    onFullscreen: function () {
+    _onFullscreen: function () {
 
         this.game.scale.startFullScreen();
     },
 
-    onStartClick: function () {
+    _onStartClick: function () {
 
         console.log('Start game');
         var state = 'Game';
@@ -83,7 +85,7 @@ MainMenu.prototype = {
         this.game.state.start(state);
     },
 
-    onTutorialClick: function () {
+    _onTutorialClick: function () {
 
         this.game.state.start('Story');
     }
