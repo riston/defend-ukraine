@@ -254,7 +254,6 @@
 
 	    _onStartClick: function () {
 
-	        console.log('Start game');
 	        var state = 'Game';
 
 	        if (Storage.isSupported() &&
