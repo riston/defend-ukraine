@@ -45,7 +45,7 @@ Preloader.prototype = {
 
         // Sound
 
-        this.load.audio('background', [ sndP + 'background.wav']);
+        this.load.audio('background', [ sndP + 'background.ogg']);
         this.load.audio('shot',       [ sndP + 'shot.wav']);
         this.load.audio('dead',       [ sndP + 'dead.wav']);
         this.load.audio('explosion',  [ sndP + 'explosion.wav']);
