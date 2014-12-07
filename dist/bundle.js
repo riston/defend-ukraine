@@ -117,8 +117,11 @@
 
 	    preload: function() {
 	        var imgP = './img/';
+	        var sndP = './snd/';
+
 	        var cX = this.game.world.centerX;
 	        var cY = this.game.world.centerY;
+
 	        this.game.stage.backgroundColor = '#16181a';
 
 	        this.preloadBg = this.add.sprite(cX - (297 / 2), cY - (145 / 2) + 200, 'preloaderBg');
@@ -144,30 +147,25 @@
 	        // Button
 	        this.load.image('play', imgP + 'button/play.png');
 
-	        this.load.image('new-game', imgP + 'button/new_game.png');
-	        this.load.image('new-game-hover', imgP + 'button/new_game_hover.png');
-	        this.load.image('new-game-click', imgP + 'button/new_game_click.png');
-
-	        this.load.image('tutorial', imgP + 'button/tutorial.png');
-	        this.load.image('tutorial-hover', imgP + 'button/tutorial_hover.png');
-	        this.load.image('tutorial-click', imgP + 'button/tutorial_click.png');
-
+	        this.load.image('new-game',   imgP + 'button/new_game.png');
+	        this.load.image('tutorial',   imgP + 'button/tutorial.png');
 	        this.load.image('fullscreen', imgP + 'button/fullscreen.png');
-	        this.load.image('fullscreen-hover', imgP + 'button/fullscreen_hover.png');
-	        this.load.image('fullscreen-click', imgP + 'button/fullscreen_click.png');
+	        this.load.spritesheet('mute', imgP + 'mute.png', 34, 34, 3);
 
+	        // Sound
 
-	//        this.load.image('tutorial', 'img/button/tutorial.png');
-	//        this.load.image('tutorial-hover', 'img/button/tutorial_hover.png');
-
-	        this.load.spritesheet('mute', 'img/mute.png', 34, 34, 3);
-
-	        this.load.audio('shot', ['snd/shot.wav']);
-	        this.load.audio('dead', ['snd/dead.wav']);
-	        this.load.audio('over', ['snd/over.wav']);
+	        this.load.audio('background', [ sndP + 'background.wav']);
+	        this.load.audio('shot',       [ sndP + 'shot.wav']);
+	        this.load.audio('dead',       [ sndP + 'dead.wav']);
+	        this.load.audio('explosion',  [ sndP + 'explosion.wav']);
+	        this.load.audio('over',       [ sndP + 'over.wav']);
+	        this.load.audio('energy',     [ sndP + 'energy.wav']);
+	        this.load.audio('game-over',  [ sndP + 'game-over.wav']);
 	    },
+
 	    create: function() {
 
+	        this.game.sound.play('background', 0.5, true);
 	        this.game.state.start('MainMenu');
 	    }
 	};
@@ -291,24 +289,22 @@
 	var Game = function(game) {
 
 	    this.BULLET_RADIUS = 30;
-	    this.SHOT_DELAY = 200;
-	    this.ENEMY_HEALTH = 30;
+	    this.SHOT_DELAY    = 200;
+	    this.ENEMY_HEALTH  = 30;
 
-	    this.lastBulletShotAt = 0;
 	};
 
 	Game.prototype = {
 
 	    create: function() {
-	        this.game.sound.mute = true;
+	        // Variable declaration
+	        this.batteryLevel = 100;
+	        this.score = 0;
+	        this.lastBulletShotAt = 0;
 
 	        this.game.input.maxPointers = 1;
 	        this.game.stage.backgroundColor = '#182d3b';
 	        this.game.physics.startSystem(Phaser.Physics.ARCADE);
-
-	        // Variable decleration
-	        this.batteryLevel = 100;
-	        this.score = 0;
 
 	        // Add background
 	        this.background = this.game.add.sprite(this.game.world.centerX, this.game.world.centerY, 'background');
@@ -363,7 +359,6 @@
 	        this.gun = this.game.add.sprite(
 	                this.game.width / 2,
 	                this.game.height, 'gun');
-
 	        this.gun.anchor.setTo(0.7, 0.5);
 
 	        this.shellEmitter = this.game.add.emitter(
@@ -452,6 +447,7 @@
 	        if (this.batteryLevel <= 0) {
 
 	            this._saveScore();
+	            this.game.sound.play('game-over');
 	            this.game.state.start('MainMenu');
 	        }
 
@@ -467,27 +463,7 @@
 	        this.tanks.forEachDead(this._spawnEnemy, this);
 
 	        // Check for collisions
-	        this.bullets.forEachExists(function (bullet) {
-
-	            if (!bullet || !bullet.bulletShotAt) {
-	                return;
-	            }
-
-	            if (!bullet.bounce &&
-	                    ~~(this.game.time.now - bullet.bulletShotAt ) >= 100) {
-
-	                bullet.alpha = 1;
-	                bullet.bounce = this.game.add.tween(bullet);
-	                bullet.bounce.to({ alpha: 0 }, Phaser.Easing.Linear.Out);
-	                bullet.bounce.onComplete.add(function() {
-
-	                    bullet.bounce = undefined;
-	                    bullet.kill();
-	                }, this);
-	                bullet.bounce.start();
-
-	            }
-	        }, this);
+	        this.bullets.forEachExists(this._bulletCollision, this);
 
 	        // Pointer is down
 	        if (this.input.activePointer.isDown) {
@@ -500,6 +476,28 @@
 	        }
 
 	        this._drawHealth();
+	    },
+
+	    _bulletCollision: function (bullet) {
+
+	        if (!bullet || !bullet.bulletShotAt) {
+	            return;
+	        }
+
+	        if (!bullet.bounce &&
+	                ~~(this.game.time.now - bullet.bulletShotAt ) >= 100) {
+
+	            bullet.alpha = 1;
+	            bullet.bounce = this.game.add.tween(bullet);
+	            bullet.bounce.to({ alpha: 0 }, Phaser.Easing.Linear.Out);
+	            bullet.bounce.onComplete.add(function() {
+
+	                bullet.bounce = undefined;
+	                bullet.kill();
+	            }, this);
+	            bullet.bounce.start();
+
+	        }
 	    },
 
 	    _generateTerrain: function () {
@@ -623,6 +621,7 @@
 	    },
 
 	    _collisionHandler: function (bullet, enemy) {
+	        var sound = 'dead';
 	        var score = 10;
 	        var x, y;
 
@@ -631,14 +630,13 @@
 	        if (enemy.health <= 0) {
 
 	            this.score += score;
-	            this.game.sound.play('dead');
-	            this._setText('+' + score + ' points');
 
-	            console.log('Kill');
+	            this._setText('+' + score + ' points');
 
 	            if (enemy.key === "tank" ||
 	                enemy.key === "truck") {
 
+	                sound ='explosion';
 	                x = enemy.x + enemy.width / 2;
 	                y = enemy.y + enemy.height / 2;
 
@@ -651,6 +649,7 @@
 	                }
 	            }
 
+	            this.game.sound.play(sound);
 	            enemy.kill();
 	        }
 	    },
@@ -692,6 +691,7 @@
 
 	        }, this);
 
+	        this.game.sound.play('energy');
 	        angle.start();
 	    },
 
@@ -740,7 +740,7 @@
 	        var x, y;
 
 	        this.text = [
-	            'Group of Ukraine soldiers were heading back to military base,',
+	            'Group of Ukraine soldiers was heading back to the military base,',
 	            'while their road were crossed with separatists near Donetsk.',
 	            'After heavy battle, you were the only survivor...',
 	            '',
@@ -779,7 +779,7 @@
 	        this.game.add.sprite(x + 25, y + 70, 'truck');
 	        this.game.add.sprite(x + 30, y + 120, 'tank');
 
-	        x += 190;
+	        x += 200;
 	        this.batteryText = this.game.add.text(x, y, 'Collect batteries to\nkeep your flashlight\nworking', textConfig);
 	        this.game.add.sprite(x + 30, y + 70, 'battery');
 
@@ -1054,7 +1054,6 @@
 
 	    this.AMMOUNT = 3;
 	    this.key = 'explosion';
-
 
 	    this.createMultiple(this.AMMOUNT, 'explosion');
 	};

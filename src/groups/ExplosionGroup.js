@@ -6,7 +6,6 @@ var ExplosionGroup = function (game) {
     this.AMMOUNT = 3;
     this.key = 'explosion';
 
-
     this.createMultiple(this.AMMOUNT, 'explosion');
 };
 

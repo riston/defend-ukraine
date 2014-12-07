@@ -17,7 +17,7 @@ Story.prototype = {
         var x, y;
 
         this.text = [
-            'Group of Ukraine soldiers were heading back to military base,',
+            'Group of Ukraine soldiers was heading back to the military base,',
             'while their road were crossed with separatists near Donetsk.',
             'After heavy battle, you were the only survivor...',
             '',
@@ -56,7 +56,7 @@ Story.prototype = {
         this.game.add.sprite(x + 25, y + 70, 'truck');
         this.game.add.sprite(x + 30, y + 120, 'tank');
 
-        x += 190;
+        x += 200;
         this.batteryText = this.game.add.text(x, y, 'Collect batteries to\nkeep your flashlight\nworking', textConfig);
         this.game.add.sprite(x + 30, y + 70, 'battery');
 

@@ -18,7 +18,15 @@ To run the webpack server:
 
 ## Images
 
+Most of the sprites are created with great tool Inkscape, so there is also SVG file for each sprite.
+
 [Explosion](http://opengameart.org/content/explosion)
+
+## Audio
+
+Background music created with ["Otomata - Generative Musical Sequencer"](http://www.earslap.com/page/otomata.html).
+
+Sound effects created with [bfxr](http://www.bfxr.net)
 
 ## License
 

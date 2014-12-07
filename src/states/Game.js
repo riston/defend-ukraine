@@ -11,24 +11,22 @@ var ExplosionGroup = require('../groups/ExplosionGroup');
 var Game = function(game) {
 
     this.BULLET_RADIUS = 30;
-    this.SHOT_DELAY = 200;
-    this.ENEMY_HEALTH = 30;
+    this.SHOT_DELAY    = 200;
+    this.ENEMY_HEALTH  = 30;
 
-    this.lastBulletShotAt = 0;
 };
 
 Game.prototype = {
 
     create: function() {
-        this.game.sound.mute = true;
+        // Variable declaration
+        this.batteryLevel = 100;
+        this.score = 0;
+        this.lastBulletShotAt = 0;
 
         this.game.input.maxPointers = 1;
         this.game.stage.backgroundColor = '#182d3b';
         this.game.physics.startSystem(Phaser.Physics.ARCADE);
-
-        // Variable decleration
-        this.batteryLevel = 100;
-        this.score = 0;
 
         // Add background
         this.background = this.game.add.sprite(this.game.world.centerX, this.game.world.centerY, 'background');
@@ -83,7 +81,6 @@ Game.prototype = {
         this.gun = this.game.add.sprite(
                 this.game.width / 2,
                 this.game.height, 'gun');
-
         this.gun.anchor.setTo(0.7, 0.5);
 
         this.shellEmitter = this.game.add.emitter(
@@ -172,6 +169,7 @@ Game.prototype = {
         if (this.batteryLevel <= 0) {
 
             this._saveScore();
+            this.game.sound.play('game-over');
             this.game.state.start('MainMenu');
         }
 
@@ -187,27 +185,7 @@ Game.prototype = {
         this.tanks.forEachDead(this._spawnEnemy, this);
 
         // Check for collisions
-        this.bullets.forEachExists(function (bullet) {
-
-            if (!bullet || !bullet.bulletShotAt) {
-                return;
-            }
-
-            if (!bullet.bounce &&
-                    ~~(this.game.time.now - bullet.bulletShotAt ) >= 100) {
-
-                bullet.alpha = 1;
-                bullet.bounce = this.game.add.tween(bullet);
-                bullet.bounce.to({ alpha: 0 }, Phaser.Easing.Linear.Out);
-                bullet.bounce.onComplete.add(function() {
-
-                    bullet.bounce = undefined;
-                    bullet.kill();
-                }, this);
-                bullet.bounce.start();
-
-            }
-        }, this);
+        this.bullets.forEachExists(this._bulletCollision, this);
 
         // Pointer is down
         if (this.input.activePointer.isDown) {
@@ -220,6 +198,28 @@ Game.prototype = {
         }
 
         this._drawHealth();
+    },
+
+    _bulletCollision: function (bullet) {
+
+        if (!bullet || !bullet.bulletShotAt) {
+            return;
+        }
+
+        if (!bullet.bounce &&
+                ~~(this.game.time.now - bullet.bulletShotAt ) >= 100) {
+
+            bullet.alpha = 1;
+            bullet.bounce = this.game.add.tween(bullet);
+            bullet.bounce.to({ alpha: 0 }, Phaser.Easing.Linear.Out);
+            bullet.bounce.onComplete.add(function() {
+
+                bullet.bounce = undefined;
+                bullet.kill();
+            }, this);
+            bullet.bounce.start();
+
+        }
     },
 
     _generateTerrain: function () {
@@ -343,6 +343,7 @@ Game.prototype = {
     },
 
     _collisionHandler: function (bullet, enemy) {
+        var sound = 'dead';
         var score = 10;
         var x, y;
 
@@ -351,14 +352,13 @@ Game.prototype = {
         if (enemy.health <= 0) {
 
             this.score += score;
-            this.game.sound.play('dead');
-            this._setText('+' + score + ' points');
 
-            console.log('Kill');
+            this._setText('+' + score + ' points');
 
             if (enemy.key === "tank" ||
                 enemy.key === "truck") {
 
+                sound ='explosion';
                 x = enemy.x + enemy.width / 2;
                 y = enemy.y + enemy.height / 2;
 
@@ -371,6 +371,7 @@ Game.prototype = {
                 }
             }
 
+            this.game.sound.play(sound);
             enemy.kill();
         }
     },
@@ -412,6 +413,7 @@ Game.prototype = {
 
         }, this);
 
+        this.game.sound.play('energy');
         angle.start();
     },
 

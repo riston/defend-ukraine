@@ -8,8 +8,11 @@ Preloader.prototype = {
 
     preload: function() {
         var imgP = './img/';
+        var sndP = './snd/';
+
         var cX = this.game.world.centerX;
         var cY = this.game.world.centerY;
+
         this.game.stage.backgroundColor = '#16181a';
 
         this.preloadBg = this.add.sprite(cX - (297 / 2), cY - (145 / 2) + 200, 'preloaderBg');
@@ -35,30 +38,25 @@ Preloader.prototype = {
         // Button
         this.load.image('play', imgP + 'button/play.png');
 
-        this.load.image('new-game', imgP + 'button/new_game.png');
-        this.load.image('new-game-hover', imgP + 'button/new_game_hover.png');
-        this.load.image('new-game-click', imgP + 'button/new_game_click.png');
-
-        this.load.image('tutorial', imgP + 'button/tutorial.png');
-        this.load.image('tutorial-hover', imgP + 'button/tutorial_hover.png');
-        this.load.image('tutorial-click', imgP + 'button/tutorial_click.png');
-
+        this.load.image('new-game',   imgP + 'button/new_game.png');
+        this.load.image('tutorial',   imgP + 'button/tutorial.png');
         this.load.image('fullscreen', imgP + 'button/fullscreen.png');
-        this.load.image('fullscreen-hover', imgP + 'button/fullscreen_hover.png');
-        this.load.image('fullscreen-click', imgP + 'button/fullscreen_click.png');
+        this.load.spritesheet('mute', imgP + 'mute.png', 34, 34, 3);
 
+        // Sound
 
-//        this.load.image('tutorial', 'img/button/tutorial.png');
-//        this.load.image('tutorial-hover', 'img/button/tutorial_hover.png');
-
-        this.load.spritesheet('mute', 'img/mute.png', 34, 34, 3);
-
-        this.load.audio('shot', ['snd/shot.wav']);
-        this.load.audio('dead', ['snd/dead.wav']);
-        this.load.audio('over', ['snd/over.wav']);
+        this.load.audio('background', [ sndP + 'background.wav']);
+        this.load.audio('shot',       [ sndP + 'shot.wav']);
+        this.load.audio('dead',       [ sndP + 'dead.wav']);
+        this.load.audio('explosion',  [ sndP + 'explosion.wav']);
+        this.load.audio('over',       [ sndP + 'over.wav']);
+        this.load.audio('energy',     [ sndP + 'energy.wav']);
+        this.load.audio('game-over',  [ sndP + 'game-over.wav']);
     },
+
     create: function() {
 
+        this.game.sound.play('background', 0.5, true);
         this.game.state.start('MainMenu');
     }
 };
