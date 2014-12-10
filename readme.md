@@ -7,6 +7,10 @@ After heavy battle, you were the only survivor...
 Separatists backup has just arrived, so you have to hold the
 last line and keep your ***flashlight*** working!
 
+## Browser support
+
+Should work with most of the latest browsers Chrome 39, Firefox 34, IE 11. There are issues with the "fullscreen mode" on Firefox and IE.
+
 ## Screenshot
 
 ![ScreenShot](https://github.com/riston/defend-ukraine/blob/master/screen/game-screen.png)
