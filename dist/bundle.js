@@ -181,7 +181,7 @@
 	 * Created by risto on 19.10.14.
 	 */
 	var Storage = __webpack_require__(6);
-	var InteractiveButton = __webpack_require__(13);
+	var InteractiveButton = __webpack_require__(7);
 
 	var MainMenu = function(game) {};
 
@@ -280,11 +280,11 @@
 	 * Created by risto on 25.10.14.
 	 */
 	var Storage        = __webpack_require__(6);
-	var SoldierGroup   = __webpack_require__(7);
-	var TruckGroup     = __webpack_require__(8);
-	var TankGroup      = __webpack_require__(9);
-	var BatteryGroup   = __webpack_require__(10);
-	var ExplosionGroup = __webpack_require__(11);
+	var SoldierGroup   = __webpack_require__(8);
+	var TruckGroup     = __webpack_require__(9);
+	var TankGroup      = __webpack_require__(10);
+	var BatteryGroup   = __webpack_require__(11);
+	var ExplosionGroup = __webpack_require__(12);
 
 	var Game = function(game) {
 
@@ -622,21 +622,18 @@
 
 	    _collisionHandler: function (bullet, enemy) {
 	        var sound = 'dead';
-	        var score = 10;
+	        var score = 20;
 	        var x, y;
 
 	        enemy.damage(this.rnd.integerInRange(5, 15));
 
 	        if (enemy.health <= 0) {
 
-	            this.score += score;
-
-	            this._setText('+' + score + ' points');
-
 	            if (enemy.key === "tank" ||
 	                enemy.key === "truck") {
 
-	                sound ='explosion';
+	                sound = 'explosion';
+	                score = 10;
 	                x = enemy.x + enemy.width / 2;
 	                y = enemy.y + enemy.height / 2;
 
@@ -649,6 +646,8 @@
 	                }
 	            }
 
+	            this.score += score;
+	            this._setText('+' + score + ' points');
 	            this.game.sound.play(sound);
 	            enemy.kill();
 	        }
@@ -722,7 +721,7 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	var Storage = __webpack_require__(6);
-	var InteractiveButton = __webpack_require__(13);
+	var InteractiveButton = __webpack_require__(7);
 
 	var Story = function(game) {
 	    this.TEXT_SPEED = 70;
@@ -885,7 +884,39 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	
-	var EnemyGroup = __webpack_require__(12);
+	var InteractiveButton = function (game, x, y, sprite, callback, callbackContext) {
+
+	    Phaser.Button.call(this, game, x, y, sprite, callback, callbackContext);
+
+	    this.key = sprite;
+
+	    this.events.onInputOver.add(this._onInputOver, this);
+	    this.events.onInputOut.add(this._onInputOut, this);
+	};
+
+	InteractiveButton.prototype = Object.create(Phaser.Button.prototype);
+	InteractiveButton.prototype.construct = InteractiveButton;
+
+	InteractiveButton.prototype._onInputOver = function (button) {
+	    this.game.sound.play('over');
+	    button.blendMode = PIXI.blendModes.ADD;
+	};
+
+	InteractiveButton.prototype._onInputOut = function (button) {
+
+	    button.blendMode = PIXI.blendModes.NORMAL;
+	};
+
+
+	module.exports = InteractiveButton;
+
+
+/***/ },
+/* 8 */
+/***/ function(module, exports, __webpack_require__) {
+
+	
+	var EnemyGroup = __webpack_require__(13);
 
 	var SoldierGroup = function (game) {
 	    this.AMMOUNT = 5;
@@ -904,11 +935,11 @@
 
 
 /***/ },
-/* 8 */
+/* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
-	var EnemyGroup = __webpack_require__(12);
+	var EnemyGroup = __webpack_require__(13);
 
 	var TruckGroup = function (game) {
 	    this.AMMOUNT = 1;
@@ -927,11 +958,11 @@
 
 
 /***/ },
-/* 9 */
+/* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
-	var EnemyGroup = __webpack_require__(12);
+	var EnemyGroup = __webpack_require__(13);
 
 	var TankGroup = function (game) {
 	    this.AMMOUNT = 2;
@@ -1004,7 +1035,7 @@
 
 
 /***/ },
-/* 10 */
+/* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -1044,7 +1075,7 @@
 
 
 /***/ },
-/* 11 */
+/* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -1085,7 +1116,7 @@
 
 
 /***/ },
-/* 12 */
+/* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -1132,38 +1163,6 @@
 	};
 
 	module.exports = EnemyGroup;
-
-
-/***/ },
-/* 13 */
-/***/ function(module, exports, __webpack_require__) {
-
-	
-	var InteractiveButton = function (game, x, y, sprite, callback, callbackContext) {
-
-	    Phaser.Button.call(this, game, x, y, sprite, callback, callbackContext);
-
-	    this.key = sprite;
-
-	    this.events.onInputOver.add(this._onInputOver, this);
-	    this.events.onInputOut.add(this._onInputOut, this);
-	};
-
-	InteractiveButton.prototype = Object.create(Phaser.Button.prototype);
-	InteractiveButton.prototype.construct = InteractiveButton;
-
-	InteractiveButton.prototype._onInputOver = function (button) {
-	    this.game.sound.play('over');
-	    button.blendMode = PIXI.blendModes.ADD;
-	};
-
-	InteractiveButton.prototype._onInputOut = function (button) {
-
-	    button.blendMode = PIXI.blendModes.NORMAL;
-	};
-
-
-	module.exports = InteractiveButton;
 
 
 /***/ }

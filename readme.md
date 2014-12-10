@@ -1,5 +1,12 @@
 # Defend Ukraine - game
 
+Group of Ukraine soldiers was heading back to the military base,
+while their road were crossed with separatists near Donetsk.
+After heavy battle, you were the only survivor...
+
+Separatists backup has just arrived, so you have to hold the
+last line and keep your ***flashlight*** working!
+
 ## Screenshot
 
 ![ScreenShot](https://github.com/riston/defend-ukraine/blob/master/screen/game-screen.png)
@@ -26,7 +33,7 @@ webpack-dev-server --progress --colors src
 
 ## Images
 
-Most of the sprites are created with great tool Inkscape, so there is also SVG file for each sprite.
+Most of the sprites are created with great open source tool Inkscape, so there is also SVG file for each sprite.
 
 [Explosion](http://opengameart.org/content/explosion) sprite.
 

@@ -344,21 +344,18 @@ Game.prototype = {
 
     _collisionHandler: function (bullet, enemy) {
         var sound = 'dead';
-        var score = 10;
+        var score = 20;
         var x, y;
 
         enemy.damage(this.rnd.integerInRange(5, 15));
 
         if (enemy.health <= 0) {
 
-            this.score += score;
-
-            this._setText('+' + score + ' points');
-
             if (enemy.key === "tank" ||
                 enemy.key === "truck") {
 
-                sound ='explosion';
+                sound = 'explosion';
+                score = 10;
                 x = enemy.x + enemy.width / 2;
                 y = enemy.y + enemy.height / 2;
 
@@ -371,6 +368,8 @@ Game.prototype = {
                 }
             }
 
+            this.score += score;
+            this._setText('+' + score + ' points');
             this.game.sound.play(sound);
             enemy.kill();
         }
